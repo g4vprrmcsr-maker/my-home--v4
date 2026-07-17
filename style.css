@@ -1017,7 +1017,6 @@ body.dark .overlay-page { background: rgba(38, 36, 40, 0.98); }
 .dock-slot {
   width: 62px;
   height: 62px;
-
   border-radius: 26%;
   overflow: hidden;
   display: flex;
