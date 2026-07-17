@@ -3113,12 +3113,11 @@ async function buildDaysPanel() {
     if (st.daysGlassMode === "clear") {
       cardBg = "rgba(255,255,255," + (a * 0.28).toFixed(2) + ")";
       cardBlur = "blur(3px)";
-
     } else {
       cardBg = "rgba(255,255,255," + (a * 0.75).toFixed(2) + ")";
       cardBlur = "blur(18px)";
-
     }
+
   }
 
   const header = el("div", "panel-header");
@@ -3786,10 +3785,11 @@ function renderBeautifyRoom(body) {
   if (st.daysTheme === "liquid") {
     body.appendChild(el("label", "form-label", "液态玻璃模式"));
     mkSeg(body,
-      [{ v: "frost", name: "磨砂" }, { v: "clear", name: "高透水感" }],
+      [{ v: "frost", name: "磨砂" }, { v: "clear", name: "高透水感" }, { v: "pure", name: "全透（壁纸直出）" }],
       () => st.daysGlassMode,
       (v) => { st.daysGlassMode = v; saveState(); }
     );
+
     mkSlider(body, "卡片透明度", 10, 90, 1, "daysGlassAlpha", "%", null);
     body.appendChild(el("label", "form-label", "相识页壁纸（传了壁纸玻璃才有东西可透）"));
     mkUpload(body, "上传壁纸", "days_wallpaper", () => {
