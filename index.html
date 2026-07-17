@@ -12,7 +12,7 @@
   <meta name="theme-color" content="#FFF9F2">
 
   <title>my home</title>
-  <link rel="stylesheet" href="style.css?v=200">
+  <link rel="stylesheet" href="style.css?v=201">
 </head>
 <body>
   <div id="app">
@@ -115,7 +115,7 @@
       <div class="panel-title" id="settings-title">设置</div>
     </div>
 
-    <div class="settings-section">
+    <div class="settings-section" id="sec-api">
       <div class="section-title">API设置</div>
       <div id="provider-bar"></div>
       <div class="form-row" style="margin-top:14px">
@@ -135,27 +135,27 @@
       </div>
     </div>
 
-    <div class="settings-section">
+    <div class="settings-section" id="sec-param">
       <div class="section-title">参数</div>
       <div id="param-body"></div>
     </div>
 
-    <div class="settings-section">
+    <div class="settings-section" id="sec-think">
       <div class="section-title">思维链</div>
       <div id="think-body"></div>
     </div>
 
-    <div class="settings-section">
+    <div class="settings-section" id="sec-split">
       <div class="section-title">分段发送（AI回复拆成多条连发）</div>
       <div id="split-body"></div>
     </div>
 
-    <div class="settings-section">
+    <div class="settings-section" id="sec-bg">
       <div class="section-title">背景（聊天 / 输入栏 / 侧边栏 / 记忆手册）</div>
       <div id="bg-body"></div>
     </div>
 
-    <div class="settings-section">
+    <div class="settings-section" id="sec-data">
       <div class="section-title">数据</div>
       <div class="btn-group">
         <button class="btn secondary" id="export-json-btn">导出JSON备份</button>
@@ -166,7 +166,7 @@
       </div>
     </div>
 
-    <div style="padding:16px 16px 40px">
+    <div style="padding:16px 16px 40px" id="sec-save">
       <button class="btn" id="save-settings-btn" style="width:100%">保存设置</button>
     </div>
   </div>
@@ -199,6 +199,6 @@
   })();
   </script>
 
-  <script src="app.js?v=200"></script>
+  <script src="app.js?v=201"></script>
 </body>
 </html>
