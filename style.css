@@ -98,13 +98,14 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
+  height: calc(100% + env(safe-area-inset-bottom) + 40px);
   background-size: cover;
   background-position: center;
   z-index: 0;
   opacity: 0;
   transition: opacity 0.3s;
 }
+
 #chat-bg.has-bg { opacity: 1; }
 
 #sidebar-mask {
