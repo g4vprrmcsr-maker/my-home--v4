@@ -677,10 +677,13 @@ function applyTheme() {
     liq.textContent = [
       ".panel:not(#days-panel){background:" + solid + "!important;",
       "backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}",
+      ".panel:not(#days-panel) .panel-header{background:" + solid + "!important;}",
+      "#theme-tabs{background:" + solid + "!important;}",
       ".overlay-page{background:" + solid + "!important;",
       "backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}"
     ].join("");
   } else {
+
     liq.textContent = "";
   }
 
