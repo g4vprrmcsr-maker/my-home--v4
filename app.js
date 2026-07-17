@@ -651,13 +651,6 @@ function applyTheme() {
   if (st.skin === "liquid") document.body.classList.add("skin-liquid");
   st.darkMode = (st.skin === "night");
 
-  /* 白条断根:theme-color跟皮肤同步,html底色一致,安全区不再是死白 */
-  const bgMap = { day: "#ffffff", night: "#1f1f1f", official: "#FAF9F5", liquid: "#eef0f3" };
-  const pageBg = bgMap[st.skin] || "#ffffff";
-  const tc = document.querySelector('meta[name="theme-color"]');
-  if (tc) tc.setAttribute("content", pageBg);
-  document.documentElement.style.background = pageBg;
-
   document.documentElement.style.setProperty("--msg-fs", st.fontSize + "px");
   document.documentElement.style.setProperty("--avatar-size", st.avatarSize + "px");
   document.documentElement.style.setProperty("--title-fs", st.titleFs + "px");
