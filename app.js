@@ -3226,7 +3226,7 @@ async function buildDaysPanel() {
 
   /* Dock:安全区垫在Dock身子外面,本体是扁扁的悬浮条 */
   const dockWrap = el("div", "");
-  dockWrap.style.cssText = "flex-shrink:0;padding-bottom:calc(env(safe-area-inset-bottom) + var(--dock-drop, 8px));";
+  dockWrap.style.cssText = "flex-shrink:0;padding-bottom:calc(env(safe-area-inset-bottom) * 0.55 + var(--dock-drop, 0px));";
   const dock = el("div", "days-dock");
   const da = (st.dockAlpha || 60) / 100;
   if (st.dockStyle === "clear") {
