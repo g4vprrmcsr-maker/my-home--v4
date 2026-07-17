@@ -4393,7 +4393,8 @@ function bindEvents() {
   $("#menu-role").onclick = () => { renderRolePage(); openPanel("#role-panel"); };
   $("#menu-memory").onclick = () => { closeSidebar(); openMemoryBook(); };
   $("#menu-days").onclick = () => { buildDaysPanel(); openPanel("#days-panel"); };
-  $("#settings-btn").onclick = () => { fillProviderForm(); renderProviderBar(); buildSettingsExtras(); openPanel("#settings-panel"); };
+  $("#settings-btn").onclick = () => { fillProviderForm(); renderProviderBar(); buildSettingsExtras(); settingsTab = ""; buildSettingsMenu(); openPanel("#settings-panel"); };
+
   $("#sidebar-role").onclick = () => { renderRolePage(); openPanel("#role-panel"); };
 
     $("#theme-back").onclick = () => {
@@ -4406,7 +4407,16 @@ function bindEvents() {
   };
 
   $("#role-back").onclick = () => closePanel("#role-panel");
-  $("#settings-back").onclick = () => closePanel("#settings-panel");
+  $("#settings-back").onclick = () => {
+    if (settingsTab) {
+      settingsTab = "";
+      buildSettingsMenu();
+      $("#settings-panel").scrollTop = 0;
+    } else {
+      closePanel("#settings-panel");
+    }
+  };
+
 
   $("#send-btn").onclick = sendMessage;
   $("#model-btn").onclick = toggleModelPopup;
