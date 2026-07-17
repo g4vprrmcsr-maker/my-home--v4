@@ -2501,7 +2501,7 @@ function mkColorArea(parent, label, hueKey, satKey, lightKey, alphaKey, onChange
 
 /* ---------- 主题面板:标签页分组 ---------- */
 let typoScope = "chat";
-let themeTab = "look";
+let themeTab = "";
 
 const THEME_TABS = [
   { k: "look", name: "皮肤" },
@@ -2515,19 +2515,34 @@ const THEME_TABS = [
 function buildThemePanel() {
   const tabs = $("#theme-tabs");
   tabs.innerHTML = "";
-  THEME_TABS.forEach(t => {
-    const b = el("button", "theme-tab" + (themeTab === t.k ? " on" : ""), t.name);
-    b.onclick = () => {
-      themeTab = t.k;
-      buildThemePanel();
-      $("#theme-panel").scrollTop = 0;
-    };
-    tabs.appendChild(b);
-  });
-
+  tabs.style.display = "none";
   const body = $("#theme-body");
   body.innerHTML = "";
 
+  if (!themeTab) {
+    $("#theme-title").textContent = "主题";
+    const wrap = el("div", "");
+    wrap.style.cssText = "padding:14px 16px;";
+    THEME_TABS.forEach(t => {
+      const row = el("div", "list-item");
+      row.style.marginBottom = "10px";
+      const nm = el("div", "list-name", t.name);
+      nm.style.flex = "1";
+      row.appendChild(nm);
+      row.appendChild(el("span", "item-more", "›"));
+      row.onclick = () => {
+        themeTab = t.k;
+        buildThemePanel();
+        $("#theme-panel").scrollTop = 0;
+      };
+      wrap.appendChild(row);
+    });
+    body.appendChild(wrap);
+    return;
+  }
+
+  const cur = THEME_TABS.find(t => t.k === themeTab);
+  $("#theme-title").textContent = cur ? cur.name : "主题";
   if (themeTab === "look") buildTabLook(body);
   if (themeTab === "bubble") buildTabBubble(body);
   if (themeTab === "layout") buildTabLayout(body);
