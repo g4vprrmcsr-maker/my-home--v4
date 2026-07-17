@@ -2019,6 +2019,55 @@ function buildSettingsExtras() {
   bb.appendChild(tip);
   mkUpload(bb, "上传" + area.name + "图片", area.key(), area.after, "移除" + area.name + "图片");
 }
+let settingsTab = "";
+const SETTINGS_SECTIONS = [
+  { k: "sec-api", name: "API设置" },
+  { k: "sec-param", name: "参数" },
+  { k: "sec-think", name: "思维链" },
+  { k: "sec-split", name: "分段发送" },
+  { k: "sec-bg", name: "背景" },
+  { k: "sec-data", name: "数据" }
+];
+
+function buildSettingsMenu() {
+  let menu = document.getElementById("settings-menu");
+  if (!menu) {
+    menu = el("div", "");
+    menu.id = "settings-menu";
+    menu.style.cssText = "padding:14px 16px;";
+    const header = document.querySelector("#settings-panel .panel-header");
+    header.parentNode.insertBefore(menu, header.nextSibling);
+  }
+  menu.innerHTML = "";
+  const secs = document.querySelectorAll("#settings-panel .settings-section");
+  const saveDiv = document.getElementById("sec-save");
+  secs.forEach(s => { s.style.display = "none"; });
+  if (saveDiv) saveDiv.style.display = "none";
+
+  if (!settingsTab) {
+    $("#settings-title").textContent = "设置";
+    const list = el("div", "ios-list");
+    SETTINGS_SECTIONS.forEach(t => {
+      const row = el("div", "ios-row");
+      row.appendChild(el("span", "", t.name));
+      row.appendChild(el("span", "ios-arrow", "›"));
+      row.onclick = () => {
+        settingsTab = t.k;
+        buildSettingsMenu();
+        $("#settings-panel").scrollTop = 0;
+      };
+      list.appendChild(row);
+    });
+    menu.appendChild(list);
+    return;
+  }
+
+  const cur = SETTINGS_SECTIONS.find(t => t.k === settingsTab);
+  $("#settings-title").textContent = cur ? cur.name : "设置";
+  const sec = document.getElementById(settingsTab);
+  if (sec) sec.style.display = "";
+  if (settingsTab === "sec-api" && saveDiv) saveDiv.style.display = "";
+}
 
 function saveSettingsForm() {
   const p = curProvider();
