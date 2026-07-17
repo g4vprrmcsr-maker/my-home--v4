@@ -382,12 +382,18 @@ async function applyBg() {
   const bgEl = $("#chat-bg");
   const blob = await getImg(curRole().id + "_bg");
   if (blob) {
-    bgEl.style.backgroundImage = "url(" + URL.createObjectURL(blob) + ")";
+    const u = URL.createObjectURL(blob);
+    bgEl.style.backgroundImage = "url(" + u + ")";
     bgEl.classList.add("has-bg");
+    document.body.style.backgroundImage = "url(" + u + ")";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
   } else {
     bgEl.style.backgroundImage = "";
     bgEl.classList.remove("has-bg");
+    document.body.style.backgroundImage = "";
   }
+
   const sbg = $("#sidebar-bg");
   const sblob = await getImg("bg_sidebar");
   sbg.style.backgroundImage = sblob ? "url(" + URL.createObjectURL(sblob) + ")" : "";
