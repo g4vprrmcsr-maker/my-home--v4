@@ -2902,8 +2902,8 @@ function iconFaceBase(T) {
     bg = hslaOf(st.iconHue, st.iconSat, st.iconLight, st.iconAlpha);
   }
   face.style.background = bg;
-  face.style.backdropFilter = "blur(14px) saturate(1.4)";
-  face.style.webkitBackdropFilter = "blur(14px) saturate(1.4)";
+  face.style.backdropFilter = "blur(14px)";
+  face.style.webkitBackdropFilter = "blur(14px)";
   const g = (st.iconGlow || 0) / 100;
   face.style.boxShadow = "inset 0 1px 1.5px rgba(255,255,255,0.65), 0 4px " + Math.round(10 + 10 * g) + "px rgba(0,0,0," + (0.08 + 0.1 * g).toFixed(2) + ")";
   return face;
@@ -3112,10 +3112,12 @@ async function buildDaysPanel() {
     const a = (st.daysGlassAlpha || 55) / 100;
     if (st.daysGlassMode === "clear") {
       cardBg = "rgba(255,255,255," + (a * 0.28).toFixed(2) + ")";
-      cardBlur = "blur(3px) saturate(1.8)";
+      cardBlur = "blur(3px)";
+
     } else {
       cardBg = "rgba(255,255,255," + (a * 0.75).toFixed(2) + ")";
-      cardBlur = "blur(18px) saturate(1.5)";
+      cardBlur = "blur(18px)";
+
     }
   }
 
