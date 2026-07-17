@@ -67,7 +67,7 @@ body.skin-liquid {
   -webkit-tap-highlight-color: transparent;
 }
 
-html { height: 100%; }
+html { height: 100vh; }
 
 html, body {
   background: var(--bg);
@@ -87,7 +87,7 @@ body {
 
 #app {
   display: flex;
-  height: 100%;
+  height: 100vh;
   position: relative;
   overflow: hidden;
 }
@@ -896,6 +896,7 @@ body.dark .overlay-page { background: rgba(38, 36, 40, 0.98); }
   display: flex;
   flex-direction: column;
   padding: 0;
+  height: 100vh;
 }
 
 #days-panel .panel-header {
