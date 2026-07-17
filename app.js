@@ -2523,20 +2523,19 @@ function buildThemePanel() {
     $("#theme-title").textContent = "主题";
     const wrap = el("div", "");
     wrap.style.cssText = "padding:14px 16px;";
+    const list = el("div", "ios-list");
     THEME_TABS.forEach(t => {
-      const row = el("div", "list-item");
-      row.style.marginBottom = "10px";
-      const nm = el("div", "list-name", t.name);
-      nm.style.flex = "1";
-      row.appendChild(nm);
-      row.appendChild(el("span", "item-more", "›"));
+      const row = el("div", "ios-row");
+      row.appendChild(el("span", "", t.name));
+      row.appendChild(el("span", "ios-arrow", "›"));
       row.onclick = () => {
         themeTab = t.k;
         buildThemePanel();
         $("#theme-panel").scrollTop = 0;
       };
-      wrap.appendChild(row);
+      list.appendChild(row);
     });
+    wrap.appendChild(list);
     body.appendChild(wrap);
     return;
   }
