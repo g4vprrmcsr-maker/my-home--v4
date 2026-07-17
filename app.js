@@ -2675,7 +2675,6 @@ function buildTabDisplay(body) {
 
 function buildTabText(body) {
   const sec = mkSection(body, "文字");
-  mkSlider(sec, "聊天字体大小", 6, 24, 1, "fontSize", "px", applyTheme);
   sec.appendChild(el("label", "form-label", "选一个区域来调"));
   mkSeg(sec,
     [{ v: "chat", name: "聊天" }, { v: "ui", name: "界面" }, { v: "name", name: "昵称" }, { v: "meta", name: "小字" }, { v: "ai", name: "他的文字" }],
@@ -2688,8 +2687,9 @@ function buildTabText(body) {
   const rM = () => renderMessages();
   const rT = () => { applyChatTypo(); renderMessages(); };
 
-  if (typoScope === "chat") {
+    if (typoScope === "chat") {
     mkFontSelect(box, "聊天字体", "chatFont", applyTheme);
+    mkSlider(box, "聊天字体大小", 6, 24, 1, "fontSize", "px", applyTheme);
     mkSlider(box, "字间距", -1, 3, 0.1, "chatSpacing", "px", rT);
     mkSlider(box, "行高", 1.3, 2.2, 0.05, "chatLineH", "", rT);
     mkSlider(box, "粗细", 300, 700, 50, "chatWeight", "", rT);
