@@ -87,11 +87,11 @@ body {
 
 #app {
   display: flex;
-  height: 100vh;
-  height: 100dvh;
+  height: 100%;
   position: relative;
   overflow: hidden;
 }
+
 
 #chat-bg {
   position: fixed;
