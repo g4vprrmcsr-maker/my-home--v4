@@ -1741,53 +1741,60 @@ function closePanel(id) { $(id).classList.remove("open"); }
    S3开始:供应商弹窗 / 设置页 / 角色页 / 导出导入 / 控件工厂
    ========================================== */
 
-/* ---------- 供应商:当前条 + 弹窗选择 ---------- */
+/* ---------- 供应商:原框折叠版 ---------- */
+let providerFold = true;
+
 function renderProviderBar() {
   const bar = $("#provider-bar");
   bar.innerHTML = "";
   const p = curProvider();
-  const name = el("div", "pb-name", p.name);
-  const desc = el("div", "list-desc", (p.baseURL || "未配置") + " · " + p.models.length + "个模型");
   const info = el("div", "");
   info.style.cssText = "flex:1;min-width:0;";
+  const name = el("div", "pb-name", p.name);
+  const desc = el("div", "list-desc", (p.baseURL || "未配置") + " · " + p.models.length + "个模型");
   info.appendChild(name);
   info.appendChild(desc);
-  const arrow = el("span", "pb-arrow", "▾ 切换");
+  const arrow = el("span", "pb-arrow", providerFold ? "▾ 展开" : "▴ 收起");
   bar.appendChild(info);
   bar.appendChild(arrow);
-  bar.onclick = toggleProviderPopup;
-}
+  bar.onclick = () => { providerFold = !providerFold; renderProviderBar(); };
 
-function toggleProviderPopup() {
-  const pop = $("#provider-popup");
-  if (pop.classList.contains("show")) {
-    pop.classList.remove("show");
-    return;
+  let list = document.getElementById("provider-fold-list");
+  if (!list) {
+    list = el("div", "");
+    list.id = "provider-fold-list";
+    list.style.marginTop = "8px";
+    bar.parentNode.insertBefore(list, bar.nextSibling);
   }
-  pop.innerHTML = "";
-  state.settings.providers.forEach(p => {
-    const div = el("div", "model-item" + (p.id === state.settings.currentProviderId ? " selected" : ""));
-    const nm = el("div", "", p.name);
-    nm.style.fontWeight = p.id === state.settings.currentProviderId ? "600" : "400";
-    const ds = el("div", "", (p.baseURL || "未配置") + " · " + p.models.length + "个模型");
-    ds.style.cssText = "font-size:11px;color:var(--text-faint);margin-top:2px;";
-    const line = el("div", "");
-    line.style.cssText = "flex:1;min-width:0;";
-    line.appendChild(nm);
-    line.appendChild(ds);
+  list.innerHTML = "";
+  if (providerFold) return;
+
+  state.settings.providers.forEach(p2 => {
+    const div = el("div", "list-item" + (p2.id === state.settings.currentProviderId ? " active" : ""));
+    const info2 = el("div", "list-info");
+    info2.appendChild(el("div", "list-name", p2.name));
+    info2.appendChild(el("div", "list-desc", (p2.baseURL || "未配置") + " · " + p2.models.length + "个模型"));
     const more = el("span", "item-more", "⋯");
+    info2.onclick = (e) => {
+      e.stopPropagation();
+      state.settings.currentProviderId = p2.id;
+      saveState();
+      renderProviderBar();
+      fillProviderForm();
+      renderModelBtn();
+      toast("已切换到 " + p2.name);
+    };
     more.onclick = (e) => {
       e.stopPropagation();
-      pop.classList.remove("show");
       showActions([
-        { label: "重命名", fn: () => inputDialog("供应商名字", p.name, v => {
-            if (v.trim()) { p.name = v.trim(); saveState(); renderProviderBar(); }
+        { label: "重命名", fn: () => inputDialog("供应商名字", p2.name, v => {
+            if (v.trim()) { p2.name = v.trim(); saveState(); renderProviderBar(); }
           }) },
         { label: "删除", danger: true, fn: () => {
             if (state.settings.providers.length <= 1) { toast("至少保留一个供应商"); return; }
             confirmDialog("删除这个供应商？", () => {
-              state.settings.providers = state.settings.providers.filter(x => x.id !== p.id);
-              if (state.settings.currentProviderId === p.id) {
+              state.settings.providers = state.settings.providers.filter(x => x.id !== p2.id);
+              if (state.settings.currentProviderId === p2.id) {
                 state.settings.currentProviderId = state.settings.providers[0].id;
               }
               saveState();
@@ -1798,29 +1805,14 @@ function toggleProviderPopup() {
           } }
       ], e.clientX, e.clientY);
     };
-    div.style.display = "flex";
-    div.style.alignItems = "center";
-    div.appendChild(line);
+    div.appendChild(info2);
     div.appendChild(more);
-    div.onclick = () => {
-      state.settings.currentProviderId = p.id;
-      saveState();
-      pop.classList.remove("show");
-      renderProviderBar();
-      fillProviderForm();
-      renderModelBtn();
-      toast("已切换到 " + p.name);
-    };
-    pop.appendChild(div);
+    list.appendChild(div);
   });
-  const addRow = el("div", "model-item", "＋ 新增供应商");
-  addRow.style.color = "var(--text-sub)";
-  addRow.onclick = () => {
-    pop.classList.remove("show");
-    newProvider();
-  };
-  pop.appendChild(addRow);
-  pop.classList.add("show");
+  const add = el("button", "btn secondary", "＋ 新增供应商");
+  add.style.cssText = "width:100%;";
+  add.onclick = (e) => { e.stopPropagation(); newProvider(); };
+  list.appendChild(add);
 }
 
 function newProvider() {
