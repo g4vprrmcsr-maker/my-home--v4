@@ -4341,14 +4341,22 @@ function bindEvents() {
   $("#sidebar-mask").onclick = closeSidebar;
   $("#new-session-btn").onclick = newSession;
 
-  $("#menu-theme").onclick = () => { buildThemePanel(); openPanel("#theme-panel"); };
+  $("#menu-theme").onclick = () => { themeTab = ""; buildThemePanel(); openPanel("#theme-panel"); };
   $("#menu-role").onclick = () => { renderRolePage(); openPanel("#role-panel"); };
   $("#menu-memory").onclick = () => { closeSidebar(); openMemoryBook(); };
   $("#menu-days").onclick = () => { buildDaysPanel(); openPanel("#days-panel"); };
   $("#settings-btn").onclick = () => { fillProviderForm(); renderProviderBar(); buildSettingsExtras(); openPanel("#settings-panel"); };
   $("#sidebar-role").onclick = () => { renderRolePage(); openPanel("#role-panel"); };
 
-  $("#theme-back").onclick = () => closePanel("#theme-panel");
+    $("#theme-back").onclick = () => {
+    if (themeTab) {
+      themeTab = "";
+      buildThemePanel();
+    } else {
+      closePanel("#theme-panel");
+    }
+  };
+
   $("#role-back").onclick = () => closePanel("#role-panel");
   $("#settings-back").onclick = () => closePanel("#settings-panel");
 
