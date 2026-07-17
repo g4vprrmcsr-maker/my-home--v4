@@ -896,9 +896,8 @@ body.dark .overlay-page { background: rgba(38, 36, 40, 0.98); }
   display: flex;
   flex-direction: column;
   padding: 0;
-  height: 100vh;
-  height: 100dvh;
 }
+
 #days-panel .panel-header {
   background: transparent;
   border-bottom: none;
