@@ -4346,6 +4346,8 @@ function bindEvents() {
 
   $("#save-settings-btn").onclick = saveSettingsForm;
   $("#fetch-models-btn").onclick = fetchModels;
+  $("#new-role-btn").onclick = newRole;
+
 
   $("#export-json-btn").onclick = exportData;
   $("#import-json-input").addEventListener("change", importData);
