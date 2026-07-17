@@ -338,6 +338,9 @@ function escHtml(s) {
 
 function mdRender(s) {
   let t = escHtml(s);
+  t = t.replace(/^[ \t]*(---+|\*\*\*+)[ \t]*$/gm, "");
+  t = t.replace(/^#{1,4}[ \t]+/gm, "");
+  t = t.replace(/^&gt;[ \t]?/gm, "");
   t = t.replace(/`([^`]+)`/g, "<code>$1</code>");
   t = t.replace(/\*\*\*([^*]+)\*\*\*/g, "<strong><em>$1</em></strong>");
   t = t.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
