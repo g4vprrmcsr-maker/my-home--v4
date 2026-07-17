@@ -2798,9 +2798,9 @@ function daysT() {
 /* 固定墨色:所有配色下文字统一,唯独墨夜用浅色保命 */
 function daysInk() {
   if (state.settings.daysTheme === "ink") {
-    return { main: "#f0e9e4", sub: "#9a8f96" };
+    return { main: "#f0e9e4", sub: "#c9c2bc" };
   }
-  return { main: "#5a4a42", sub: "#b39a90" };
+  return { main: "#3a3634", sub: "#3a3634" };
 }
 
 function daysNumColor(T) {
