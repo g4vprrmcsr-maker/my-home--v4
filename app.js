@@ -2895,15 +2895,21 @@ function iconFaceBase(T) {
   const st = state.settings;
   const face = el("div", "app-icon-face");
   face.style.borderRadius = st.iconRound === "circle" ? "50%" : "26%";
-  let bg;
-  if (st.iconHue < 0) {
+    let bg;
+  const pure = st.daysTheme === "liquid" && st.daysGlassMode === "pure";
+  if (pure && st.iconHue < 0) {
+    bg = "rgba(255,255,255,0.06)";
+  } else if (st.iconHue < 0) {
     bg = "rgba(255,255,255," + ((st.iconAlpha / 100) * 0.55).toFixed(2) + ")";
   } else {
     bg = hslaOf(st.iconHue, st.iconSat, st.iconLight, st.iconAlpha);
   }
   face.style.background = bg;
-  face.style.backdropFilter = "blur(14px)";
-  face.style.webkitBackdropFilter = "blur(14px)";
+  if (!pure) {
+    face.style.backdropFilter = "blur(14px)";
+    face.style.webkitBackdropFilter = "blur(14px)";
+  }
+
   const g = (st.iconGlow || 0) / 100;
   face.style.boxShadow = "inset 0 1px 1.5px rgba(255,255,255,0.65), 0 4px " + Math.round(10 + 10 * g) + "px rgba(0,0,0," + (0.08 + 0.1 * g).toFixed(2) + ")";
   return face;
