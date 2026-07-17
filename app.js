@@ -385,14 +385,18 @@ async function applyBg() {
     const u = URL.createObjectURL(blob);
     bgEl.style.backgroundImage = "url(" + u + ")";
     bgEl.classList.add("has-bg");
-    document.body.style.backgroundImage = "url(" + u + ")";
-    document.body.style.backgroundSize = "cover";
-    document.body.style.backgroundPosition = "center";
+    const H = document.documentElement;
+    H.style.backgroundImage = "url(" + u + ")";
+    H.style.backgroundSize = "cover";
+    H.style.backgroundPosition = "center";
+    document.body.style.background = "transparent";
   } else {
     bgEl.style.backgroundImage = "";
     bgEl.classList.remove("has-bg");
-    document.body.style.backgroundImage = "";
+    document.documentElement.style.backgroundImage = "";
+    document.body.style.background = "";
   }
+
 
   const sbg = $("#sidebar-bg");
   const sblob = await getImg("bg_sidebar");
