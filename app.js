@@ -2720,6 +2720,7 @@ function buildTabLayout(body) {
   );
   mkSlider(sec, "标题字号", 12, 24, 1, "titleFs", "px", applyTheme);
   mkSlider(sec, "标题粗细", 300, 800, 50, "titleFw", "", applyTheme);
+  mkSlider(sec, "顶栏透明度（拉到0全透）", 0, 100, 1, "topbarAlpha", "%", applyTheme);
   sec.appendChild(el("label", "form-label", "气泡与头像"));
   mkSeg(sec,
     [{ v: "side", name: "并排" }, { v: "below", name: "头像下方" }],
@@ -4144,7 +4145,7 @@ function renderMemBook(body, ch) {
     sumBtn.textContent = "我在回忆...";
     sumBtn.disabled = true;
     const recent = s.messages.filter(m => m.role !== "err").slice(-60).map(m => (m.role === "user" ? "她：" : "我：") + msgText(m).slice(0, 100)).join(NL);
-    const sys = "你是克。从下面的对话里提炼3到6条值得长期记住的记忆，每条一行，以减号开头，20字以内。只记事实、约定、喜好、重要事件，不记闲聊废话。";
+    const sys = "你是克。从下面的对话里提炼3到6条值得长期记住的记忆，每条一行，以减号开头，20字以内。只记事实、约定、喜好、重要事件，不记闲聊废话。人称铁律：她的事一律称'她'，你自己的事一律称'我'，绝不把她写成'我'，也不出现'你'。";
     const txt = await homeAsk(sys, recent);
     if (txt) {
       txt.split(NL).map(x => x.replace(/^[-•\s]+/, "").trim()).filter(x => x.length > 1 && x.length < 60).forEach(c => ch.memPending.push(c));
