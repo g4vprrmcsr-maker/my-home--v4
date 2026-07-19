@@ -631,8 +631,10 @@ function dressMeta(row, isUser) {
     e.style.fontWeight = String(st.nameWeight);
     e.style.fontSize = (st.nameSize || 11) + "px";
     e.style.color = nameGray;
-    e.style.display = st.showName ? "" : "none";
+    e.style.display = st.showName ? "inline-block" : "none";
+    e.style.transform = "translateY(" + (st.nameDrop || 0) + "px)";
   });
+
   row.querySelectorAll(".msg-time").forEach(e => {
     e.style.fontFamily = metaF;
     e.style.fontWeight = String(st.metaWeight);
@@ -1101,7 +1103,38 @@ async function buildMsgRow(m, gi, aiSrc, userSrc) {
   }
 
   body.appendChild(bubble);
+  if (st.msgBarOn) {
+    const gv = st.skin === "night" ? Math.min(255, st.metaShade + 60) : st.metaShade;
+    const bar = document.createElement("div");
+    bar.className = "msg-toolbar";
+    bar.style.cssText = "display:flex;gap:16px;margin-top:" + st.metaGap + "px;font-size:15px;color:rgb(" + gv + "," + gv + "," + gv + ");" + (isUser ? "justify-content:flex-end;" : "");
+    const mk = (glyph, fn2, danger) => {
+      const b2 = document.createElement("span");
+      b2.textContent = glyph;
+      if (danger) b2.style.color = "#c85560";
+      b2.onclick = (ev) => {
+        ev.stopPropagation();
+        if (streaming) { toast("等他说完"); return; }
+        fn2();
+      };
+      bar.appendChild(b2);
+    };
+    mk("❏", () => copyText(msgText(m)));
+    mk("✎", () => inputDialog("编辑消息", msgText(m), v => {
+      if (v.trim()) { m.versions[m.vi] = v; saveState(); renderMessages(); }
+    }, true));
+    if (!isUser) mk("↻", () => regenerate(m));
+    mk("☑", () => enterMultiMode(m.id));
+    mk("✕", () => confirmDialog("删除这条消息？", () => {
+      const s2 = curSession();
+      s2.messages = s2.messages.filter(x2 => x2.id !== m.id);
+      saveState();
+      renderMessages();
+    }), true);
+    body.appendChild(bar);
+  }
   body.appendChild(footer);
+
   row.appendChild(check);
   row.appendChild(avatar);
   row.appendChild(body);
@@ -2816,6 +2849,7 @@ function buildTabText(body) {
   if (typoScope === "name") {
     mkFontSelect(box, "昵称字体", "nameFont", rM);
     mkSlider(box, "大小", 8, 16, 1, "nameSize", "px", rM);
+    mkSlider(box, "昵称下移", 0, 14, 1, "nameDrop", "px", rM);
     mkSlider(box, "粗细", 200, 700, 50, "nameWeight", "", rM);
   }
   if (typoScope === "meta") {
