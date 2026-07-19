@@ -1006,6 +1006,32 @@ function pushErrMsg(text, ctx) {
   });
   saveState();
 }
+/* ---------- 操作栏细线图标 ---------- */
+function barIcon(kind) {
+  const s = 'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"';
+  if (kind === "copy") return '<svg viewBox="0 0 24 24" width="16" height="16"><rect x="9" y="9" width="11" height="11" rx="2.5" ' + s + '/><path d="M5 15 V6.5 A2.5 2.5 0 0 1 7.5 4 H16" ' + s + '/></svg>';
+  if (kind === "roll") return '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M19.5 12 a7.5 7.5 0 1 1 -2.2 -5.3" ' + s + '/><path d="M19.5 3.5 v3.7 h-3.7" ' + s + '/></svg>';
+  return '<svg viewBox="0 0 24 24" width="16" height="16"><circle cx="5.5" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="18.5" cy="12" r="1.3" fill="currentColor"/></svg>';
+}
+
+function openSelectCopy(text) {
+  const mask = document.createElement("div");
+  mask.className = "dialog-mask";
+  const dlg = document.createElement("div");
+  dlg.className = "dialog";
+  const h = el("div", "dialog-title", "长按选字");
+  const t = el("div", "", text);
+  t.style.cssText = "font-size:14px;line-height:1.8;white-space:pre-wrap;overflow-y:auto;max-height:50vh;-webkit-user-select:text;user-select:text;padding:4px 2px;";
+  const btns = el("div", "dialog-btns");
+  const ok = el("button", "btn", "完成");
+  ok.onclick = () => mask.remove();
+  btns.appendChild(ok);
+  dlg.appendChild(h);
+  dlg.appendChild(t);
+  dlg.appendChild(btns);
+  mask.appendChild(dlg);
+  document.body.appendChild(mask);
+}
 
 /* ---------- 单行装配 ---------- */
 async function buildMsgRow(m, gi, aiSrc, userSrc) {
@@ -2790,7 +2816,13 @@ function buildTabLayout(body) {
     () => state.settings.bubbleAlign,
     (v) => { state.settings.bubbleAlign = v; saveState(); renderMessages(); }
   );
-  sec.appendChild(el("label", "form-label", "头像形状"));
+    sec.appendChild(el("label", "form-label", "昵称位置（并排时生效）"));
+  mkSeg(sec,
+    [{ v: false, name: "贴顶" }, { v: true, name: "对齐头像中线" }],
+    () => state.settings.nameMid,
+    (v) => { state.settings.nameMid = v; saveState(); renderMessages(); }
+  );
+   sec.appendChild(el("label", "form-label", "头像形状"));
   mkSeg(sec,
     [{ v: "circle", name: "圆形" }, { v: "square", name: "微信方圆" }],
     () => state.settings.avatarShape,
