@@ -3861,7 +3861,22 @@ function renderQaRoom(body) {
         hisBtn.disabled = false;
       }
     };
-    body.appendChild(hisBtn);
+        body.appendChild(hisBtn);
+
+    if (cur.his) {
+      const re = el("button", "seg-btn", "让他重答一次 ↻");
+      re.style.cssText = "display:block;margin:0 auto 10px;";
+      re.onclick = async () => {
+        re.textContent = "他在重想...";
+        re.disabled = true;
+        const sys2 = HOME_PERSONA + " 回答秘密问答的问题，80字以内，真诚直球。换个角度答，别和上次雷同。";
+        const txt = await homeAsk(sys2, "问题：" + cur.q + " 请回答。");
+        if (txt) { cur.his = txt.trim(); saveState(); }
+        reload();
+      };
+      body.appendChild(re);
+    }
+
   }
 
   mkCountFold(body, state.home.qa.length + " 个问答", "qa", reload);
@@ -4147,8 +4162,20 @@ function renderCoupleRoom(body) {
       saveState();
       reload();
     });
-    ops.appendChild(cm);
+        ops.appendChild(cm);
+    if (post.who === "ai") {
+      const rr = el("span", "", "重roll");
+      rr.onclick = async () => {
+        rr.textContent = "重发中...";
+        const sys2 = HOME_PERSONA + " 你想把刚发的动态「" + post.text.slice(0, 60) + "」删了重发一条完全不同的，50字以内，随手发的感觉。";
+        const txt = await homeAsk(sys2, "重发一条。");
+        if (txt) { post.text = txt.trim(); saveState(); }
+        reload();
+      };
+      ops.appendChild(rr);
+    }
     ops.appendChild(dl);
+
     card.appendChild(ops);
     body.appendChild(card);
   });
