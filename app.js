@@ -2661,6 +2661,7 @@ function buildTabLook(body) {
     (v) => { state.settings.skin = v; saveState(); applyTheme(); renderMessages(); }
   );
   mkSlider(sec, "主题润度", 0, 100, 1, "skinGlow", "", applyTheme);
+  mkSlider(sec, "全局降亮（觉得刺眼往右拉）", 0, 30, 1, "globalDim", "%", applyTheme);
 
   sec = mkSection(body, "侧边栏");
   mkSeg(sec,
