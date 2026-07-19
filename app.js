@@ -1163,30 +1163,44 @@ async function buildMsgRow(m, gi, aiSrc, userSrc) {
     const gv = st.skin === "night" ? Math.min(255, st.metaShade + 60) : st.metaShade;
     const bar = document.createElement("div");
     bar.className = "msg-toolbar";
-    bar.style.cssText = "display:flex;gap:16px;margin-top:" + st.metaGap + "px;font-size:15px;color:rgb(" + gv + "," + gv + "," + gv + ");" + (isUser ? "justify-content:flex-end;" : "");
-    const mk = (glyph, fn2, danger) => {
+    bar.style.cssText = "display:flex;gap:18px;align-items:center;margin-top:" + (st.msgBarGap === undefined ? 8 : st.msgBarGap) + "px;color:rgb(" + gv + "," + gv + "," + gv + ");" + (isUser ? "justify-content:flex-end;" : "");
+    const mk = (kind, fn2) => {
       const b2 = document.createElement("span");
-      b2.textContent = glyph;
-      if (danger) b2.style.color = "#c85560";
+      b2.style.cssText = "display:inline-flex;padding:2px;";
+      b2.innerHTML = barIcon(kind);
       b2.onclick = (ev) => {
         ev.stopPropagation();
         if (streaming) { toast("等他说完"); return; }
-        fn2();
+        fn2(ev);
       };
       bar.appendChild(b2);
     };
-    mk("❏", () => copyText(msgText(m)));
-    mk("✎", () => inputDialog("编辑消息", msgText(m), v => {
-      if (v.trim()) { m.versions[m.vi] = v; saveState(); renderMessages(); }
-    }, true));
-    if (!isUser) mk("↻", () => regenerate(m));
-    mk("☑", () => enterMultiMode(m.id));
-    mk("✕", () => confirmDialog("删除这条消息？", () => {
-      const s2 = curSession();
-      s2.messages = s2.messages.filter(x2 => x2.id !== m.id);
-      saveState();
-      renderMessages();
-    }), true);
+    mk("copy", () => copyText(msgText(m)));
+    if (!isUser) mk("roll", () => regenerate(m));
+    mk("more", (ev) => {
+      const items = [
+        { label: "选择复制", fn: () => openSelectCopy(msgText(m)) },
+        { label: "编辑消息", fn: () => inputDialog("编辑消息", msgText(m), v => {
+            if (v.trim()) { m.versions[m.vi] = v; saveState(); renderMessages(); }
+          }, true) },
+        { label: "多条删除", fn: () => enterMultiMode(m.id) }
+      ];
+      if (m.img || (m.imgs && m.imgs.length)) {
+        items.push({ label: "删除图片", danger: true, fn: () => confirmDialog("删除这条的图片？", () => {
+            delete m.img;
+            delete m.imgs;
+            saveState();
+            renderMessages();
+          }) });
+      }
+      items.push({ label: "删除", danger: true, fn: () => confirmDialog("删除这条消息？", () => {
+          const s2 = curSession();
+          s2.messages = s2.messages.filter(x2 => x2.id !== m.id);
+          saveState();
+          renderMessages();
+        }) });
+      showActions(items, ev.clientX, ev.clientY);
+    });
     body.appendChild(bar);
   }
   body.appendChild(footer);
