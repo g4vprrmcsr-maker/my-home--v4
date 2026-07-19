@@ -4513,8 +4513,14 @@ function initKeyboardFix() {
   const vv = window.visualViewport;
   let raf = null;
 
-  function fit() {
+    function fit() {
+    if (document.activeElement !== input) {
+      ia.style.transform = "";
+      area.style.paddingBottom = "";
+      return;
+    }
     const gap = window.innerHeight - vv.height - vv.offsetTop;
+
     if (gap > 40) {
       ia.style.transform = "translateY(-" + gap + "px)";
       area.style.paddingBottom = (gap + 8) + "px";
