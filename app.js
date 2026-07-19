@@ -100,7 +100,12 @@ function defaultSettings() {
     uiFs: 14,
     nameSize: 11,
     daysDateSize: 12,
-    coupleAuto: false
+        coupleAuto: false,
+    paraGap: 8,
+    globalDim: 0,
+    topbarAlpha: 100,
+    nameDrop: 0,
+    msgBarOn: true
   };
 }
 
@@ -349,8 +354,18 @@ function mdRender(s) {
 }
 
 function setMsgHtml(node, text) {
-  node.textContent = text;
+  node.innerHTML = "";
+  const gap = state.settings.paraGap === undefined ? 8 : state.settings.paraGap;
+  const paras = String(text).replace(/——/g, "――").split(new RegExp(NL + "{2,}"));
+  paras.forEach((p, i) => {
+    const d = document.createElement("div");
+    d.textContent = p;
+    d.style.whiteSpace = "pre-wrap";
+    if (i < paras.length - 1) d.style.marginBottom = gap + "px";
+    node.appendChild(d);
+  });
 }
+
 
 /* ---------- 默认头像 ---------- */
 const AI_FALLBACK = "data:image/svg+xml;utf8," + encodeURIComponent(
