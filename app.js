@@ -2679,6 +2679,7 @@ function buildTabBubble(body) {
   mkSlider(sec, "左右宽度", 4, 22, 1, "bubblePadH", "px", () => renderMessages());
   mkSlider(sec, "最大宽度", 55, 100, 1, "bubbleMaxW", "%", () => { applyBubbleBox(); renderMessages(); });
   mkSlider(sec, "圆角弧度", 0, 26, 1, "bubbleRadius", "px", () => renderMessages());
+  mkSlider(sec, "段落间距（消息里空行的高度）", 0, 24, 1, "paraGap", "px", () => renderMessages());
   mkColorArea(sec, "我的气泡颜色", "userHue", "userSat", "userLight", "userAlpha");
   mkColorArea(sec, "AI气泡颜色", "aiHue", "aiSat", "aiLight", "aiAlpha");
   mkSlider(sec, "润度（0为原味）", 0, 100, 1, "bubbleGlow", "", () => renderMessages());
