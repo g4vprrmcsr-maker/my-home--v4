@@ -757,6 +757,30 @@ function applyTheme() {
   $("#role-title").textContent = T.role;
   $("#settings-title").textContent = T.settings;
 
+    let dim = document.getElementById("dim-overlay");
+  if (!dim) {
+    dim = el("div", "");
+    dim.id = "dim-overlay";
+    dim.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:99999;background:#000;opacity:0;";
+    document.body.appendChild(dim);
+  }
+  dim.style.opacity = ((st.globalDim || 0) / 100).toFixed(2);
+
+  let tbs = document.getElementById("topbar-style");
+  if (!tbs) {
+    tbs = document.createElement("style");
+    tbs.id = "topbar-style";
+    document.head.appendChild(tbs);
+  }
+  const tAlpha = (st.topbarAlpha === undefined ? 100 : st.topbarAlpha) / 100;
+  if (tAlpha >= 1) {
+    tbs.textContent = "";
+  } else {
+    const tbase = st.skin === "night" ? "30,30,32" : "255,255,255";
+    tbs.textContent = "#topbar{background:rgba(" + tbase + "," + tAlpha.toFixed(2) + ")!important;" +
+      (tAlpha < 0.05 ? "border-bottom-color:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;" : "") + "}";
+  }
+
   $("#model-btn").classList.toggle("hidden", !st.showModelBtn);
 }
 
