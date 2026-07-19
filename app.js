@@ -2856,12 +2856,13 @@ function buildTabLayout(body) {
 
 function buildTabDisplay(body) {
   const sec = mkSection(body, "显示");
-  sec.appendChild(el("label", "form-label", "消息下方操作栏（复制 编辑 重roll 多选 删除）"));
+  sec.appendChild(el("label", "form-label", "消息下方操作栏"));
   mkSeg(sec,
     [{ v: true, name: "显示" }, { v: false, name: "隐藏" }],
     () => state.settings.msgBarOn,
     (v) => { state.settings.msgBarOn = v; saveState(); renderMessages(); }
   );
+  mkSlider(sec, "操作栏与消息的距离", 0, 30, 1, "msgBarGap", "px", () => renderMessages());
   sec.appendChild(el("label", "form-label", "时间戳"));
   mkSeg(sec,
     [{ v: true, name: "显示" }, { v: false, name: "不显示" }],
