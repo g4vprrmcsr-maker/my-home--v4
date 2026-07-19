@@ -100,13 +100,16 @@ function defaultSettings() {
     uiFs: 14,
     nameSize: 11,
     daysDateSize: 12,
-        coupleAuto: false,
+       coupleAuto: false,
     paraGap: 8,
     globalDim: 0,
     topbarAlpha: 100,
     nameDrop: 0,
-    msgBarOn: true
+    msgBarOn: true,
+    nameMid: false,
+    msgBarGap: 8
   };
+
 }
 
 function defaultHome() {
@@ -356,15 +359,25 @@ function mdRender(s) {
 function setMsgHtml(node, text) {
   node.innerHTML = "";
   const gap = state.settings.paraGap === undefined ? 8 : state.settings.paraGap;
-  const paras = String(text).replace(/——/g, "――").split(new RegExp(NL + "{2,}"));
+  const paras = String(text).split(new RegExp(NL + "{2,}"));
   paras.forEach((p, i) => {
     const d = document.createElement("div");
-    d.textContent = p;
     d.style.whiteSpace = "pre-wrap";
+    const parts = p.split("——");
+    parts.forEach((seg, j) => {
+      if (seg) d.appendChild(document.createTextNode(seg));
+      if (j < parts.length - 1) {
+        const dash = document.createElement("span");
+        dash.textContent = "——";
+        dash.style.cssText = "letter-spacing:-0.16em;margin-right:0.16em;";
+        d.appendChild(dash);
+      }
+    });
     if (i < paras.length - 1) d.style.marginBottom = gap + "px";
     node.appendChild(d);
   });
 }
+
 
 
 /* ---------- 默认头像 ---------- */
@@ -652,7 +665,24 @@ function dressMeta(row, isUser) {
     av.style.borderRadius = st.avatarShape === "square" ? "6px" : "50%";
     if (!st.showAvatar) av.style.display = "none";
   });
-  row.style.marginBottom = st.msgGap + "px";
+    row.style.marginBottom = st.msgGap + "px";
+
+  const metaBox = row.querySelector(".msg-meta");
+  if (metaBox) {
+    if (st.nameMid && st.showAvatar && st.bubbleAlign === "side") {
+      metaBox.style.minHeight = st.avatarSize + "px";
+      metaBox.style.display = "flex";
+      metaBox.style.alignItems = "center";
+      metaBox.style.gap = "6px";
+      metaBox.style.justifyContent = isUser ? "flex-end" : "flex-start";
+    } else {
+      metaBox.style.minHeight = "";
+      metaBox.style.display = "";
+      metaBox.style.alignItems = "";
+      metaBox.style.justifyContent = "";
+    }
+  }
+
 
   if (st.bubbleAlign === "below") {
     row.style.flexDirection = "column";
