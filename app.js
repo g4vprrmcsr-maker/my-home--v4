@@ -2780,6 +2780,12 @@ function buildTabLayout(body) {
 
 function buildTabDisplay(body) {
   const sec = mkSection(body, "显示");
+  sec.appendChild(el("label", "form-label", "消息下方操作栏（复制 编辑 重roll 多选 删除）"));
+  mkSeg(sec,
+    [{ v: true, name: "显示" }, { v: false, name: "隐藏" }],
+    () => state.settings.msgBarOn,
+    (v) => { state.settings.msgBarOn = v; saveState(); renderMessages(); }
+  );
   sec.appendChild(el("label", "form-label", "时间戳"));
   mkSeg(sec,
     [{ v: true, name: "显示" }, { v: false, name: "不显示" }],
@@ -3631,9 +3637,28 @@ function renderLetterRoom(body) {
     if (ok) { toast("信到了 💌"); reload(); }
     else { btn.textContent = "收今天的信 ✉️"; btn.disabled = false; }
   };
-  body.appendChild(btn);
+    body.appendChild(btn);
+
+  if (fresh) {
+    const re = el("button", "seg-btn", "不满意？让他重写 ↻");
+    re.style.cssText = "display:block;margin:0 auto 10px;";
+    re.onclick = async () => {
+      re.textContent = "他在重写...";
+      re.disabled = true;
+      for (let i = state.home.letters.length - 1; i >= 0; i--) {
+        if (state.home.letters[i].day === today) { state.home.letters.splice(i, 1); break; }
+      }
+      state.home.lastLetterDay = "";
+      saveState();
+      const ok = await genLetter();
+      if (ok) toast("重写好了 💌");
+      reload();
+    };
+    body.appendChild(re);
+  }
 
   const swRow = el("div", "");
+
   swRow.style.cssText = "display:flex;align-items:center;justify-content:space-between;padding:6px 2px 12px;";
   const swLabel = el("span", "", "写作时参考最近日记（防车轱辘话）");
   swLabel.style.cssText = "font-size:12px;color:#999;";
@@ -3704,9 +3729,28 @@ function renderDiaryRoom(body) {
     if (ok) { toast("偷看成功 👀"); reload(); }
     else { btn.textContent = "偷看他今天的日记 📓"; btn.disabled = false; }
   };
-  body.appendChild(btn);
+    body.appendChild(btn);
+
+  if (fresh) {
+    const re = el("button", "seg-btn", "不满意？让他重写 ↻");
+    re.style.cssText = "display:block;margin:0 auto 10px;";
+    re.onclick = async () => {
+      re.textContent = "他在重写...";
+      re.disabled = true;
+      for (let i = state.home.diaries.length - 1; i >= 0; i--) {
+        if (state.home.diaries[i].day === today) { state.home.diaries.splice(i, 1); break; }
+      }
+      state.home.lastDiaryDay = "";
+      saveState();
+      const ok = await genDiary();
+      if (ok) toast("偷看到新的了 👀");
+      reload();
+    };
+    body.appendChild(re);
+  }
 
   mkCountFold(body, state.home.diaries.length + " 篇日记", "diary", reload);
+
   if (roomFold.diary) return;
 
   const list = state.home.diaries.slice().reverse();
