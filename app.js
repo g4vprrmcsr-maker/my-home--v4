@@ -957,10 +957,8 @@ async function buildMsgRow(m, gi, aiSrc, userSrc) {
   const avatar = document.createElement("img");
   avatar.className = "msg-avatar";
   avatar.src = isUser ? userSrc : aiSrc;
-  const hideAv = (st.splitAvatarOnce && gi.inGroup && !gi.isFirst) || bare;
+  const hideAv = st.splitAvatarOnce && gi.inGroup && !gi.isFirst;
   if (hideAv) avatar.classList.add("ghost");
-  if (bare) avatar.style.display = "none";
-
   const body = document.createElement("div");
   body.className = "msg-body " + (isUser ? "msg-body-user" : "msg-body-ai");
   if (bare) {
