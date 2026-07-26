@@ -109,8 +109,10 @@ function defaultSettings() {
     nameMid: false,
     msgBarGap: 8,
     splitGap: 6,
-    tokenInBar: false
+    tokenInBar: false,
+    bubblePresets: []
   };
+
 
 }
 
@@ -667,48 +669,61 @@ function dressMeta(row, isUser) {
     av.style.borderRadius = st.avatarShape === "square" ? "6px" : "50%";
     if (!st.showAvatar) av.style.display = "none";
   });
-    row.style.marginBottom = st.msgGap + "px";
-
   const metaBox = row.querySelector(".msg-meta");
+  const av = row.querySelector(".msg-avatar");
+  const bodyEl = row.querySelector(".msg-body");
+  const mid = st.nameMid && st.showAvatar && !(bodyEl && bodyEl.classList.contains("bare-full"));
+
+  row.style.position = "";
+  row.style.flexDirection = "";
+  row.style.gap = "";
+  row.style.alignItems = "";
   if (metaBox) {
-    if (st.nameMid && st.showAvatar && st.bubbleAlign === "side") {
-      row.style.alignItems = "flex-start";
-      metaBox.style.height = st.avatarSize + "px";
-      metaBox.style.minHeight = "0";
-      metaBox.style.display = "flex";
-      metaBox.style.alignItems = "center";
-      metaBox.style.gap = "6px";
-      metaBox.style.margin = "0";
-      metaBox.style.justifyContent = isUser ? "flex-end" : "flex-start";
-      row.querySelectorAll(".msg-name").forEach(e => { e.style.transform = "none"; });
-    } else {
-      row.style.alignItems = "";
-      metaBox.style.height = "";
-      metaBox.style.minHeight = "";
-      metaBox.style.display = "";
-      metaBox.style.alignItems = "";
-      metaBox.style.gap = "";
-      metaBox.style.margin = "";
-      metaBox.style.justifyContent = "";
-    }
+    metaBox.style.position = "";
+    metaBox.style.top = "";
+    metaBox.style.left = "";
+    metaBox.style.right = "";
+    metaBox.style.transform = "";
+    metaBox.style.whiteSpace = "";
+    metaBox.style.margin = "";
+  }
+  if (av) av.style.alignSelf = "";
+  if (bodyEl) {
+    bodyEl.style.alignSelf = "";
+    bodyEl.style.paddingTop = "";
   }
 
   if (st.bubbleAlign === "below") {
     row.style.flexDirection = "column";
     row.style.gap = "4px";
-    const av = row.querySelector(".msg-avatar");
-    const body = row.querySelector(".msg-body");
-    if (av && body) {
-      if (isUser) {
-        av.style.alignSelf = "flex-end";
-        body.style.alignSelf = "flex-end";
-      } else {
-        av.style.alignSelf = "flex-start";
-        body.style.alignSelf = "flex-start";
-      }
-      if (!body.classList.contains("bare-full")) body.style.maxWidth = "88%";
+    if (av && bodyEl) {
+      av.style.alignSelf = isUser ? "flex-end" : "flex-start";
+      bodyEl.style.alignSelf = isUser ? "flex-end" : "flex-start";
+      if (!bodyEl.classList.contains("bare-full")) bodyEl.style.maxWidth = "88%";
     }
+  } else if (mid) {
+    row.style.alignItems = "flex-start";
   }
+
+  if (mid && metaBox) {
+    row.style.position = "relative";
+    metaBox.style.position = "absolute";
+    metaBox.style.top = Math.round(st.avatarSize / 2) + "px";
+    metaBox.style.transform = "translateY(-50%)";
+    metaBox.style.margin = "0";
+    metaBox.style.whiteSpace = "nowrap";
+    if (isUser) {
+      metaBox.style.right = (st.avatarSize + 8) + "px";
+    } else {
+      metaBox.style.left = (st.avatarSize + 8) + "px";
+    }
+    if (bodyEl && st.bubbleAlign !== "below") {
+      bodyEl.style.paddingTop = (st.avatarSize + 4) + "px";
+    }
+    row.querySelectorAll(".msg-name").forEach(e => { e.style.transform = "none"; });
+  }
+
+  row.style.marginBottom = st.msgGap + "px";
 }
 
 /* ---------- 皮肤引擎 ---------- */
