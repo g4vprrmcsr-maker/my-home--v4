@@ -2560,9 +2560,90 @@ function mkSection(parent, title) {
   parent.appendChild(wrap);
   return sec;
 }
+/* ---------- 细线图标库:currentColor跟皮肤走 ---------- */
+function lineIcon(kind) {
+  const s = 'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"';
+  const P = {
+    skin: '<circle cx="12" cy="12" r="8" ' + s + '/><path d="M12 4 a8 8 0 0 1 0 16 Z" fill="currentColor" opacity="0.18" stroke="none"/>',
+    sidebar: '<rect x="4" y="5" width="16" height="14" rx="2.5" ' + s + '/><path d="M9.5 5 v14" ' + s + '/>',
+    globe: '<circle cx="12" cy="12" r="8" ' + s + '/><path d="M4 12 h16" ' + s + '/><path d="M12 4 c3 2.5 3 13.5 0 16 M12 4 c-3 2.5 -3 13.5 0 16" ' + s + '/>',
+    drop: '<path d="M12 4.5 c-3.4 4 -5.4 6.7 -5.4 9.2 a5.4 5.4 0 0 0 10.8 0 c0 -2.5 -2 -5.2 -5.4 -9.2 Z" ' + s + '/>',
+    bubble: '<path d="M12 5 c-4.4 0 -8 2.8 -8 6.2 c0 2 1.2 3.7 3 4.8 L6.3 19.3 l3.4 -1.5 c0.7 0.2 1.5 0.2 2.3 0.2 c4.4 0 8 -2.8 8 -6.2 C20 7.8 16.4 5 12 5 Z" ' + s + '/>',
+    shapes: '<circle cx="9" cy="9" r="4.5" ' + s + '/><rect x="11.5" y="11.5" width="8" height="8" rx="2" ' + s + '/>',
+    alignc: '<path d="M5 7 h14 M8.5 12 h7 M5 17 h14" ' + s + '/>',
+    chip: '<rect x="7" y="7" width="10" height="10" rx="2" ' + s + '/><path d="M10 7 V4.5 M14 7 V4.5 M10 19.5 V17 M14 19.5 V17 M7 10 H4.5 M7 14 H4.5 M19.5 10 H17 M19.5 14 H17" ' + s + '/>',
+    avatar: '<circle cx="12" cy="9" r="3.5" ' + s + '/><path d="M5.5 19.5 c1 -3.5 3.5 -5.2 6.5 -5.2 s5.5 1.7 6.5 5.2" ' + s + '/>',
+    clock: '<circle cx="12" cy="12" r="8" ' + s + '/><path d="M12 7.5 V12 l3.2 2" ' + s + '/>',
+    calendar: '<rect x="4.5" y="6" width="15" height="13.5" rx="2" ' + s + '/><path d="M4.5 10.5 h15 M8.5 4.5 v3 M15.5 4.5 v3" ' + s + '/>',
+    position: '<circle cx="12" cy="12" r="5.5" ' + s + '/><path d="M12 4 v2.5 M12 17.5 V20 M4 12 h2.5 M17.5 12 H20" ' + s + '/>',
+    hash: '<path d="M9.5 4.5 L8 19.5 M16 4.5 L14.5 19.5 M5 9.5 h15 M4.5 15 h15" ' + s + '/>',
+    tag: '<path d="M4.5 5.8 a1.3 1.3 0 0 1 1.3 -1.3 h5.4 l8.3 8.3 a1.5 1.5 0 0 1 0 2.1 l-4.9 4.9 a1.5 1.5 0 0 1 -2.1 0 L4.5 11.2 Z" ' + s + '/><circle cx="8.6" cy="8.6" r="1.1" ' + s + '/>',
+    bar: '<rect x="3.5" y="8.5" width="17" height="7" rx="3.5" ' + s + '/><circle cx="8" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="1" fill="currentColor" stroke="none"/>',
+    stream: '<path d="M4.5 7 H17 M4.5 12 h15 M4.5 17 h10.5" ' + s + '/>',
+    power: '<path d="M12 4 v7" ' + s + '/><path d="M7.8 6.5 a7 7 0 1 0 8.4 0" ' + s + '/>',
+    bulb: '<path d="M9.7 17.5 h4.6 M10.4 20 h3.2" ' + s + '/><path d="M12 4 a5.4 5.4 0 0 1 3 9.9 c-0.6 0.4 -1 1 -1 1.7 h-4 c0 -0.7 -0.4 -1.3 -1 -1.7 A5.4 5.4 0 0 1 12 4 Z" ' + s + '/>',
+    eye: '<path d="M3.5 12 C6 7.7 9 5.7 12 5.7 s6 2 8.5 6.3 C18 16.3 15 18.3 12 18.3 s-6 -2 -8.5 -6.3 Z" ' + s + '/><circle cx="12" cy="12" r="2.6" ' + s + '/>',
+    glass: '<rect x="5" y="5" width="14" height="14" rx="3.5" ' + s + '/><path d="M8.5 15.5 L15.5 8.5 M12 17 l5 -5" ' + s + '/>',
+    target: '<circle cx="12" cy="12" r="7.5" ' + s + '/><circle cx="12" cy="12" r="3" ' + s + '/>',
+    bg: '<rect x="4" y="5" width="16" height="14" rx="2" ' + s + '/><circle cx="9" cy="9.8" r="1.5" ' + s + '/><path d="M5 16.8 l4 -3.6 3.6 3 2.4 -2 4 3.4" ' + s + '/>',
+    font: '<path d="M6 19 L12 5 l6 14 M8.4 13.5 h7.2" ' + s + '/>',
+    layout: '<rect x="4" y="5" width="16" height="14" rx="2" ' + s + '/><path d="M4 11 h16 M11 11 v8" ' + s + '/>',
+    mem: '<path d="M12 6.3 C10 5 7 4.7 4.5 5.5 V18.3 C7 17.5 10 17.8 12 19.2 c2 -1.4 5 -1.7 7.5 -0.9 V5.5 C17 4.7 14 5 12 6.3 Z" ' + s + '/><path d="M12 6.3 V19.2" ' + s + '/>',
+    api: '<path d="M7.3 17.5 a4.1 4.1 0 0 1 -0.3 -8.2 a5.2 5.2 0 0 1 10.1 1.1 a3.6 3.6 0 0 1 -0.6 7.1 Z" ' + s + '/>',
+    param: '<path d="M5 8.5 h2.8 M12.2 8.5 H19 M5 15.5 h7.8 M17.2 15.5 H19" ' + s + '/><circle cx="10" cy="8.5" r="2.2" ' + s + '/><circle cx="15" cy="15.5" r="2.2" ' + s + '/>',
+    split: '<path d="M5 5.5 h14 M5 9 h9 M5 15 h14 M5 18.5 h7" ' + s + '/>',
+    data: '<ellipse cx="12" cy="6.5" rx="7" ry="2.7" ' + s + '/><path d="M5 6.5 V17.5 c0 1.5 3.1 2.7 7 2.7 s7 -1.2 7 -2.7 V6.5" ' + s + '/><path d="M5 12 c0 1.5 3.1 2.7 7 2.7 s7 -1.2 7 -2.7" ' + s + '/>'
+  };
+  if (!P[kind]) return "";
+  return '<svg viewBox="0 0 24 24">' + P[kind] + "</svg>";
+}
+
+/* 行标题对图标的认领表 */
+const ROW_ICONS = {
+  "皮肤": "skin",
+  "侧边栏样式": "sidebar",
+  "菜单语言": "globe",
+  "质感": "drop",
+  "AI无气泡": "bubble",
+  "形状": "shapes",
+  "标题居中": "alignc",
+  "昵称居中": "alignc",
+  "输入框模型显示": "chip",
+  "头像形状": "avatar",
+  "时间戳": "clock",
+  "时间格式": "calendar",
+  "时间戳位置": "position",
+  "token统计": "hash",
+  "token位置": "position",
+  "双方昵称": "tag",
+  "双方头像": "avatar",
+  "消息下方操作栏": "bar",
+  "输出方式": "stream",
+  "总开关": "power",
+  "总开关（用思考模型时再开）": "bulb",
+  "显示方式": "eye",
+  "分段时间戳": "clock",
+  "分段头像": "avatar",
+  "液态玻璃模式": "glass",
+  "选一个区域来调": "target",
+  "选一个区域": "bg"
+};
+
+function rowLead(text, cls) {
+  const lead = el("div", "row-lead");
+  const kind = ROW_ICONS[text] || (text.indexOf("字体") >= 0 ? "font" : "");
+  if (kind) {
+    const ic = el("span", "row-ic");
+    ic.innerHTML = lineIcon(kind);
+    lead.appendChild(ic);
+  }
+  lead.appendChild(el("span", cls, text));
+  return lead;
+}
+
 function mkPickRow(parent, label, opts, getV, setV) {
   const row = el("div", "pick-row");
-  row.appendChild(el("span", "pick-label", label));
+  row.appendChild(rowLead(label, "pick-label"));
   const val = el("span", "pick-val");
   function refresh() {
     const cur = opts.find(o => o.v === getV());
@@ -2574,6 +2655,7 @@ function mkPickRow(parent, label, opts, getV, setV) {
     const menu = el("div", "pick-menu");
     opts.forEach(o => {
       const it = el("div", "pick-item" + (o.v === getV() ? " on" : ""), o.name);
+      if (o.font) it.style.fontFamily = o.font;
       it.onclick = (ev) => {
         ev.stopPropagation();
         menu.remove();
