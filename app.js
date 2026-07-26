@@ -2647,7 +2647,7 @@ function rowLead(text, cls) {
 
 function mkPickRow(parent, label, opts, getV, setV) {
     const row = el("div", "pick-row");
-    row.appendChild(rowLead(lbl, "pick-label"));
+    row.appendChild(rowLead(label, "pick-label"));
   const val = el("span", "pick-val");
   function refresh() {
     const cur = opts.find(o => o.v === getV());
