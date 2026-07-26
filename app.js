@@ -1093,7 +1093,12 @@ async function buildMsgRow(m, gi, aiSrc, userSrc) {
   }
 
   let timeOk = st.showTime;
-  if (st.splitTimeLast && gi.inGroup && !gi.isLast) timeOk = false;
+  const stm = st.splitTimeMode || (st.splitTimeLast ? "last" : "all");
+  if (gi.inGroup) {
+    if (stm === "last" && !gi.isLast) timeOk = false;
+    if (stm === "first" && !gi.isFirst) timeOk = false;
+  }
+
   let nameOk = st.showName;
   if (st.splitAvatarOnce && gi.inGroup && !gi.isFirst) nameOk = false;
 
@@ -2200,11 +2205,11 @@ function buildSettingsExtras() {
     (v) => { state.settings.splitSend = v; saveState(); }
   );
   mkSlider(sb, "分段上限", 2, 20, 1, "splitMax", "段", null);
-  sb.appendChild(el("label", "form-label", "分段时间戳"));
+    sb.appendChild(el("label", "form-label", "分段时间戳"));
   mkSeg(sb,
-    [{ v: false, name: "每条都显示" }, { v: true, name: "只在最后一条" }],
-    () => state.settings.splitTimeLast,
-    (v) => { state.settings.splitTimeLast = v; saveState(); renderMessages(); }
+    [{ v: "all", name: "每条都显示" }, { v: "first", name: "只在第一条" }, { v: "last", name: "只在最后一条" }],
+    () => state.settings.splitTimeMode || (state.settings.splitTimeLast ? "last" : "all"),
+    (v) => { state.settings.splitTimeMode = v; state.settings.splitTimeLast = (v === "last"); saveState(); renderMessages(); }
   );
   sb.appendChild(el("label", "form-label", "分段头像"));
   mkSeg(sb,
