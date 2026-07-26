@@ -1230,6 +1230,9 @@ async function buildMsgRow(m, gi, aiSrc, userSrc) {
         mn.style.flexDirection = "column";
         mn.style.alignItems = "stretch";
         mn.querySelectorAll(".act-btn").forEach(b3 => { b3.style.textAlign = "left"; });
+        const r2 = mn.getBoundingClientRect();
+        mn.style.left = Math.max(8, Math.min(ev.clientX, window.innerWidth - r2.width - 8)) + "px";
+        mn.style.top = Math.max(8, Math.min(ev.clientY, window.innerHeight - r2.height - 8)) + "px";
       }
     });
     if (!isUser && st.tokenInBar && st.showToken && m.tokens) {
@@ -2865,6 +2868,45 @@ function buildTabBubble(body) {
   mkColorArea(sec, "我的气泡颜色", "userHue", "userSat", "userLight", "userAlpha");
   mkColorArea(sec, "AI气泡颜色", "aiHue", "aiSat", "aiLight", "aiAlpha");
   mkSlider(sec, "润度（0为原味）", 0, 100, 1, "bubbleGlow", "", () => renderMessages());
+  sec.appendChild(el("label", "form-label", "气泡方案（存下当前的形状和颜色）"));
+  const PKEYS = ["bubbleTexture", "bubbleShape", "aiBare", "bubbleGlow", "bubblePadV", "bubblePadH", "bubbleMaxW", "bubbleRadius", "userHue", "userSat", "userLight", "userAlpha", "aiHue", "aiSat", "aiLight", "aiAlpha", "paraGap"];
+  const saveBtn = el("button", "btn secondary", "保存当前气泡样式");
+  saveBtn.style.cssText = "width:100%;margin-bottom:8px;";
+  saveBtn.onclick = () => {
+    inputDialog("给这套样式起个名", "", v => {
+      if (!v.trim()) return;
+      const data = {};
+      PKEYS.forEach(k => { data[k] = state.settings[k]; });
+      state.settings.bubblePresets.push({ id: uid(), name: v.trim(), data: data });
+      saveState();
+      buildThemePanel();
+      toast("存好了");
+    });
+  };
+  sec.appendChild(saveBtn);
+  (state.settings.bubblePresets || []).forEach(ps => {
+    const prow = el("div", "list-item");
+    prow.style.marginBottom = "6px";
+    const nm = el("div", "list-name", ps.name);
+    nm.style.flex = "1";
+    nm.onclick = () => {
+      Object.keys(ps.data).forEach(k => { state.settings[k] = ps.data[k]; });
+      saveState();
+      applyBubbleBox();
+      renderMessages();
+      buildThemePanel();
+      toast("已应用「" + ps.name + "」");
+    };
+    const pdel = el("span", "item-more", "✕");
+    pdel.onclick = () => confirmDialog("删除这套样式？", () => {
+      state.settings.bubblePresets = state.settings.bubblePresets.filter(x => x.id !== ps.id);
+      saveState();
+      buildThemePanel();
+    });
+    prow.appendChild(nm);
+    prow.appendChild(pdel);
+    sec.appendChild(prow);
+  });
 }
 
 function buildTabLayout(body) {
