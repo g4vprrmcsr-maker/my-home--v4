@@ -1257,11 +1257,8 @@ async function buildMsgRow(m, gi, aiSrc, userSrc) {
 
   if (hideAv) avatar.classList.add("ghost");
 
-  if (st.showAvatar && !hideAv) {
-    bindLongPress(avatar, (x, y) => msgMenu(m, x, y));
-  } else {
-    bindLongPress(meta, (x, y) => msgMenu(m, x, y));
-  }
+ /* 头像菜单已退役,功能全在操作栏三个点里 */
+
 
   return row;
 }
@@ -3021,7 +3018,7 @@ function buildTabText(body) {
 
   if (typoScope === "chat") {
     mkFontSelect(box, "聊天字体", "chatFont", applyTheme);
-    mkSlider(box, "聊天字体大小", 6, 24, 1, "fontSize", "px", applyTheme);
+    mkSlider(box, "聊天字体大小", 6, 24, 0.25, "fontSize", "px", applyTheme);
     mkSlider(box, "字间距", -1, 3, 0.1, "chatSpacing", "px", rT);
     mkSlider(box, "行高", 1.3, 2.2, 0.05, "chatLineH", "", rT);
     mkSlider(box, "粗细", 300, 700, 50, "chatWeight", "", rT);
@@ -3059,7 +3056,7 @@ function buildTabText(body) {
     box.appendChild(sw);
     if (state.settings.aiTypoOn) {
       mkFontSelect(box, "他的字体", "aiFont2", rT);
-      mkSlider(box, "他的字号", 6, 30, 1, "aiSize2", "px", rT);
+      mkSlider(box, "他的字号", 6, 30, 0.25, "aiSize2", "px", rT);
       mkSlider(box, "他的粗细", 300, 700, 50, "aiWeight2", "", rT);
       mkSlider(box, "他的字间距", -1, 3, 0.1, "aiSpacing2", "px", rT);
       mkSlider(box, "他的行高", 1.3, 2.2, 0.05, "aiLineH2", "", rT);
