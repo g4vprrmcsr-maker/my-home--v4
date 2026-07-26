@@ -672,7 +672,8 @@ function dressMeta(row, isUser) {
   const metaBox = row.querySelector(".msg-meta");
   const av = row.querySelector(".msg-avatar");
   const bodyEl = row.querySelector(".msg-body");
-  const mid = st.nameMid && st.showAvatar && !(bodyEl && bodyEl.classList.contains("bare-full"));
+  const avOk = av && st.showAvatar && !av.classList.contains("ghost") && av.style.display !== "none";
+  const mid = st.nameMid && avOk;
 
   row.style.position = "";
   row.style.flexDirection = "";
@@ -718,7 +719,7 @@ function dressMeta(row, isUser) {
       metaBox.style.left = (st.avatarSize + 8) + "px";
     }
     if (bodyEl && st.bubbleAlign !== "below") {
-      bodyEl.style.paddingTop = (st.avatarSize + 4) + "px";
+      bodyEl.style.paddingTop = (st.avatarSize + 6 + (st.metaGap || 0)) + "px";
     }
     row.querySelectorAll(".msg-name").forEach(e => { e.style.transform = "none"; });
   }
@@ -2881,25 +2882,39 @@ function buildTabBubble(body) {
     });
   };
   sec.appendChild(saveBtn);
-  (state.settings.bubblePresets || []).forEach(ps => {
+   (state.settings.bubblePresets || []).forEach(ps => {
     const prow = el("div", "list-item");
     prow.style.marginBottom = "6px";
-    const nm = el("div", "list-name", ps.name);
+    const sw = el("div", "");
+    sw.style.cssText = "display:flex;gap:4px;margin-right:10px;";
+    [["userHue", "userSat", "userLight", "userAlpha"], ["aiHue", "aiSat", "aiLight", "aiAlpha"]].forEach(K => {
+      const dot = el("div", "");
+      let bg;
+      if (ps.data[K[0]] < 0) bg = "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(180,180,180,0.4))";
+      else bg = "hsla(" + ps.data[K[0]] + "," + ps.data[K[1]] + "%," + ps.data[K[2]] + "%," + (ps.data[K[3]] / 100) + ")";
+      dot.style.cssText = "width:18px;height:18px;border-radius:50%;border:1px solid rgba(0,0,0,0.1);background:" + bg + ";";
+      sw.appendChild(dot);
+    });
+    const shapeName = BUBBLE_SHAPES[ps.data.bubbleShape] ? BUBBLE_SHAPES[ps.data.bubbleShape].name : "";
+    const nm = el("div", "list-name", ps.name + (shapeName ? " · " + shapeName : ""));
     nm.style.flex = "1";
-    nm.onclick = () => {
+    const use = () => {
       Object.keys(ps.data).forEach(k => { state.settings[k] = ps.data[k]; });
       saveState();
       applyBubbleBox();
       renderMessages();
-      buildThemePanel();
+      closePanel("#theme-panel");
       toast("已应用「" + ps.name + "」");
     };
+    sw.onclick = use;
+    nm.onclick = use;
     const pdel = el("span", "item-more", "✕");
     pdel.onclick = () => confirmDialog("删除这套样式？", () => {
       state.settings.bubblePresets = state.settings.bubblePresets.filter(x => x.id !== ps.id);
       saveState();
       buildThemePanel();
     });
+    prow.appendChild(sw);
     prow.appendChild(nm);
     prow.appendChild(pdel);
     sec.appendChild(prow);
