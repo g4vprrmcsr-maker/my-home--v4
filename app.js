@@ -2888,6 +2888,7 @@ function mkColorArea(parent, label, hueKey, satKey, lightKey, alphaKey, onChange
 /* ---------- 主题面板:标签页分组 ---------- */
 let typoScope = "chat";
 let themeTab = "";
+let bubbleSizeFold = true;
 
 const THEME_TABS = [
   { k: "look", name: "皮肤" },
@@ -2969,7 +2970,8 @@ function buildTabBubble(body) {
     () => state.settings.bubbleTexture,
     (v) => { state.settings.bubbleTexture = v; saveState(); renderMessages(); }
   );
-  sec.appendChild(el("label", "form-label", "AI消息"));
+   sec.appendChild(el("label", "form-label", "AI无气泡"));
+
   mkSeg(sec,
     [{ v: false, name: "有气泡" }, { v: true, name: "无气泡（铺满）" }],
     () => state.settings.aiBare,
@@ -2981,12 +2983,18 @@ function buildTabBubble(body) {
     () => state.settings.bubbleShape,
     (v) => { state.settings.bubbleShape = v; saveState(); renderMessages(); }
   );
-  sec.appendChild(el("label", "form-label", "尺寸（你自己捏）"));
-  mkSlider(sec, "上下厚度", 2, 18, 1, "bubblePadV", "px", () => renderMessages());
-  mkSlider(sec, "左右宽度", 4, 22, 1, "bubblePadH", "px", () => renderMessages());
-  mkSlider(sec, "最大宽度", 55, 100, 1, "bubbleMaxW", "%", () => { applyBubbleBox(); renderMessages(); });
-  mkSlider(sec, "圆角弧度", 0, 26, 1, "bubbleRadius", "px", () => renderMessages());
-  mkSlider(sec, "段落间距（消息里空行的高度）", 0, 24, 1, "paraGap", "px", () => renderMessages());
+    const szBtn = el("button", "fold-btn", bubbleSizeFold ? "尺寸（点开细捏） ▼" : "尺寸（收起） ▲");
+  szBtn.style.margin = "8px 0 6px";
+  szBtn.onclick = () => { bubbleSizeFold = !bubbleSizeFold; buildThemePanel(); };
+  sec.appendChild(szBtn);
+  if (!bubbleSizeFold) {
+    mkSlider(sec, "上下厚度", 2, 18, 1, "bubblePadV", "px", () => renderMessages());
+    mkSlider(sec, "左右宽度", 4, 22, 1, "bubblePadH", "px", () => renderMessages());
+    mkSlider(sec, "最大宽度", 55, 100, 1, "bubbleMaxW", "%", () => { applyBubbleBox(); renderMessages(); });
+    mkSlider(sec, "圆角弧度", 0, 26, 1, "bubbleRadius", "px", () => renderMessages());
+    mkSlider(sec, "段落间距（消息里空行的高度）", 0, 24, 1, "paraGap", "px", () => renderMessages());
+  }
+
   mkColorArea(sec, "我的气泡颜色", "userHue", "userSat", "userLight", "userAlpha");
   mkColorArea(sec, "AI气泡颜色", "aiHue", "aiSat", "aiLight", "aiAlpha");
   mkSlider(sec, "润度（0为原味）", 0, 100, 1, "bubbleGlow", "", () => renderMessages());
