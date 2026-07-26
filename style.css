@@ -1268,10 +1268,10 @@ body.skin-liquid { --set-bg: #e9ecf0; }
 .tgl-label { font-size: 14px; color: var(--text-main); }
 .tgl {
   position: relative;
-  width: 48px;
-  height: 29px;
+  width: 42px;
+  height: 26px;
   border-radius: 999px;
-  background: rgba(120, 120, 128, 0.24);
+  background: rgba(120, 120, 128, 0.22);
   border: none;
   flex-shrink: 0;
   transition: background 0.2s;
@@ -1282,15 +1282,16 @@ body.skin-liquid { --set-bg: #e9ecf0; }
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 25px;
-  height: 25px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s;
 }
-.tgl.on { background: #34c759; }
-.tgl.on::after { transform: translateX(19px); }
+.tgl.on { background: #3f3a37; }
+.tgl.on::after { transform: translateX(16px); }
+body.dark .tgl.on { background: #8f8880; }
 body.dark .tgl { background: rgba(120, 120, 128, 0.4); }
 
 .pick-row {
@@ -1336,6 +1337,34 @@ body.dark .tgl { background: rgba(120, 120, 128, 0.4); }
 .pick-item.on { font-weight: 600; }
 .pick-item.on::after { content: "✓"; font-size: 13px; }
 
-::-webkit-scrollbar { width: 0; height: 0; }
+.pick-label { font-weight: 500; }
 
+#settings-panel .settings-section input[type="range"] { height: 3px; }
+#settings-panel .settings-section input[type="range"]::-webkit-slider-thumb {
+  width: 20px;
+  height: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+#settings-panel .settings-section .slider-row { margin-bottom: 0; padding: 10px 0 12px; }
+#settings-panel .settings-section .slider-row + .slider-row { border-top: 0.5px solid var(--line); }
+
+.preset-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  margin-bottom: 6px;
+  max-width: 300px;
+}
+.preset-name {
+  flex: 1;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+::-webkit-scrollbar { width: 0; height: 0; }
 
