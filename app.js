@@ -742,6 +742,13 @@ function dressMeta(row, isUser) {
 
   row.style.marginBottom = st.msgGap + "px";
 }
+/* ---------- 发送键图形 ---------- */
+function sendGlyphHtml() {
+  if (state.settings.chatUi === "gpt") {
+    return '<svg viewBox="0 0 24 24" width="17" height="17"><path d="M4.5 11.5 L19.5 4.5 L16.2 19.5 L11.8 13.6 L4.5 11.5 Z M11.8 13.6 L19.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+  return "↑";
+}
 
 /* ---------- 皮肤引擎 ---------- */
 function applyTheme() {
@@ -757,8 +764,12 @@ function applyTheme() {
   document.documentElement.style.setProperty("--title-fs", st.titleFs + "px");
   document.documentElement.style.setProperty("--title-fw", String(st.titleFw));
 
+  document.body.classList.toggle("gpt-ui", st.chatUi === "gpt");
+  const sbtn = $("#send-btn");
+  if (sbtn && !streaming) sbtn.innerHTML = sendGlyphHtml();
   const ib = $("#input-box");
-  if (st.skin === "liquid") {
+  if (st.skin === "liquid" && st.chatUi !== "gpt") {
+
     ib.style.background = "rgba(255,255,255,0.28)";
     ib.style.boxShadow = "inset 0 1px 1px rgba(255,255,255,0.55), 0 4px 16px rgba(0,0,0,0.06)";
   } else {
@@ -1837,7 +1848,7 @@ async function runStream(aiMsg, messages, isRegen) {
   } finally {
     streaming = false;
     abortCtrl = null;
-    btn.textContent = "↑";
+    btn.innerHTML = sendGlyphHtml();
     btn.disabled = false;
     btn.onclick = sendMessage;
     if (bubbleEl) bubbleEl.classList.remove("typing-cursor");
@@ -2616,6 +2627,7 @@ function lineIcon(kind) {
 /* 行标题对图标的认领表 */
 const ROW_ICONS = {
   "皮肤": "skin",
+  "聊天界面": "layout",
   "侧边栏样式": "sidebar",
   "菜单语言": "globe",
   "质感": "drop",
@@ -3032,6 +3044,11 @@ function buildTabLook(body) {
   );
   mkSlider(sec, "主题润度", 0, 100, 1, "skinGlow", "", applyTheme);
   mkSlider(sec, "全局降亮（觉得刺眼往右拉）", 0, 30, 1, "globalDim", "%", applyTheme);
+  mkPickRow(sec, "聊天界面",
+    [{ v: "home", name: "经典" }, { v: "gpt", name: "简约" }],
+    () => state.settings.chatUi,
+    (v) => { state.settings.chatUi = v; saveState(); applyTheme(); }
+  );
 
   sec = mkSection(body, "侧边栏");
   mkPickRow(sec, "侧边栏样式",
