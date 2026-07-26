@@ -3014,22 +3014,19 @@ function buildTabBubble(body) {
     });
   };
   sec.appendChild(saveBtn);
-   (state.settings.bubblePresets || []).forEach(ps => {
-    const prow = el("div", "list-item");
-    prow.style.marginBottom = "6px";
+    (state.settings.bubblePresets || []).forEach(ps => {
+    const prow = el("div", "preset-row");
     const sw = el("div", "");
-    sw.style.cssText = "display:flex;gap:4px;margin-right:10px;";
+    sw.style.cssText = "display:flex;gap:3px;flex-shrink:0;";
     [["userHue", "userSat", "userLight", "userAlpha"], ["aiHue", "aiSat", "aiLight", "aiAlpha"]].forEach(K => {
       const dot = el("div", "");
       let bg;
       if (ps.data[K[0]] < 0) bg = "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(180,180,180,0.4))";
       else bg = "hsla(" + ps.data[K[0]] + "," + ps.data[K[1]] + "%," + ps.data[K[2]] + "%," + (ps.data[K[3]] / 100) + ")";
-      dot.style.cssText = "width:18px;height:18px;border-radius:50%;border:1px solid rgba(0,0,0,0.1);background:" + bg + ";";
+      dot.style.cssText = "width:14px;height:14px;border-radius:50%;border:1px solid rgba(0,0,0,0.1);background:" + bg + ";";
       sw.appendChild(dot);
     });
-    const shapeName = BUBBLE_SHAPES[ps.data.bubbleShape] ? BUBBLE_SHAPES[ps.data.bubbleShape].name : "";
-    const nm = el("div", "list-name", ps.name + (shapeName ? " · " + shapeName : ""));
-    nm.style.flex = "1";
+    const nm = el("div", "preset-name", ps.name);
     const use = () => {
       Object.keys(ps.data).forEach(k => { state.settings[k] = ps.data[k]; });
       saveState();
@@ -3040,7 +3037,16 @@ function buildTabBubble(body) {
     };
     sw.onclick = use;
     nm.onclick = use;
+    const ed = el("span", "item-more", "✎");
+    ed.style.cssText = "font-size:13px;padding:4px 6px;";
+    ed.onclick = (e) => {
+      e.stopPropagation();
+      inputDialog("改名", ps.name, v => {
+        if (v.trim()) { ps.name = v.trim(); saveState(); buildThemePanel(); }
+      });
+    };
     const pdel = el("span", "item-more", "✕");
+    pdel.style.cssText = "font-size:13px;padding:4px 6px;";
     pdel.onclick = () => confirmDialog("删除这套样式？", () => {
       state.settings.bubblePresets = state.settings.bubblePresets.filter(x => x.id !== ps.id);
       saveState();
@@ -3048,6 +3054,7 @@ function buildTabBubble(body) {
     });
     prow.appendChild(sw);
     prow.appendChild(nm);
+    prow.appendChild(ed);
     prow.appendChild(pdel);
     sec.appendChild(prow);
   });
@@ -3055,7 +3062,7 @@ function buildTabBubble(body) {
 
 function buildTabLayout(body) {
   const sec = mkSection(body, "布局");
-  sec.appendChild(el("label", "form-label", "标题位置"));
+  sec.appendChild(el("label", "form-label", "标题居中"));
   mkSeg(sec,
     [{ v: false, name: "居左" }, { v: true, name: "居中" }],
     () => state.settings.titleCenter,
@@ -3070,7 +3077,7 @@ function buildTabLayout(body) {
     () => state.settings.bubbleAlign,
     (v) => { state.settings.bubbleAlign = v; saveState(); renderMessages(); }
   );
-    sec.appendChild(el("label", "form-label", "昵称位置（并排时生效）"));
+   sec.appendChild(el("label", "form-label", "昵称居中"));
   mkSeg(sec,
     [{ v: false, name: "贴顶" }, { v: true, name: "对齐头像中线" }],
     () => state.settings.nameMid,
@@ -3084,11 +3091,11 @@ function buildTabLayout(body) {
   );
   mkSlider(sec, "头像大小", 20, 52, 1, "avatarSize", "px", () => { applyTheme(); renderMessages(); });
   mkSlider(sec, "消息之间的间距", 0, 40, 1, "msgGap", "px", () => renderMessages());
-  mkSlider(sec, "分段消息间距（同一轮连发）", 0, 30, 1, "splitGap", "px", () => renderMessages());
+  mkSlider(sec, "分段消息间距（可拉到负数更贴）", -12, 30, 1, "splitGap", "px", () => renderMessages());
   mkSlider(sec, "小字与气泡的距离", 0, 20, 1, "metaGap", "px", () => renderMessages());
   mkSlider(sec, "头像与气泡的呼吸距离", 0, 30, 1, "avBubbleGap", "px", () => renderMessages());
   mkSlider(sec, "输入框下移", 0, 34, 1, "inputLift", "", applyLayout);
-  sec.appendChild(el("label", "form-label", "输入栏模型按钮"));
+  sec.appendChild(el("label", "form-label", "输入框模型显示"));
   mkSeg(sec,
     [{ v: true, name: "显示" }, { v: false, name: "隐藏" }],
     () => state.settings.showModelBtn,
