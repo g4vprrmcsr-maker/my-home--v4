@@ -2938,7 +2938,7 @@ function buildThemePanel() {
 
 function buildTabLook(body) {
   let sec = mkSection(body, "皮肤");
-  mkSeg(sec,
+  mkPickRow(sec, "皮肤",
     [{ v: "day", name: "白天" }, { v: "night", name: "夜间" }, { v: "official", name: "官方" }, { v: "liquid", name: "液态" }],
     () => state.settings.skin,
     (v) => { state.settings.skin = v; saveState(); applyTheme(); renderMessages(); }
@@ -2947,15 +2947,14 @@ function buildTabLook(body) {
   mkSlider(sec, "全局降亮（觉得刺眼往右拉）", 0, 30, 1, "globalDim", "%", applyTheme);
 
   sec = mkSection(body, "侧边栏");
-  mkSeg(sec,
+  mkPickRow(sec, "侧边栏样式",
     [{ v: "white", name: "纯白" }, { v: "clear", name: "高透液态" }],
     () => state.settings.sidebarStyle,
     (v) => { state.settings.sidebarStyle = v; saveState(); applyTheme(); }
   );
   mkSlider(sec, "透明度", 0, 100, 1, "sidebarAlpha", "%", applyTheme);
   mkSlider(sec, "模糊度（0为纯透）", 0, 30, 1, "sidebarBlur", "px", applyTheme);
-  sec.appendChild(el("label", "form-label", "菜单语言"));
-  mkSeg(sec,
+  mkPickRow(sec, "菜单语言",
     [{ v: "zh", name: "中文" }, { v: "en", name: "English" }],
     () => state.settings.menuLang,
     (v) => { state.settings.menuLang = v; saveState(); applyTheme(); }
