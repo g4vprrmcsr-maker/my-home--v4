@@ -2211,9 +2211,8 @@ function buildSettingsExtras() {
     () => state.settings.splitTimeMode || (state.settings.splitTimeLast ? "last" : "all"),
     (v) => { state.settings.splitTimeMode = v; state.settings.splitTimeLast = (v === "last"); saveState(); renderMessages(); }
   );
-  sb.appendChild(el("label", "form-label", "分段头像"));
-  mkSeg(sb,
-    [{ v: false, name: "每条都显示" }, { v: true, name: "一轮只显示一次" }],
+    mkPickRow(sb, "分段头像",
+    [{ v: false, name: "每条都显示" }, { v: true, name: "只在第一条显示" }],
     () => state.settings.splitAvatarOnce,
     (v) => { state.settings.splitAvatarOnce = v; saveState(); renderMessages(); }
   );
