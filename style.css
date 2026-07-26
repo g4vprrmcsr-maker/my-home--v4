@@ -1366,5 +1366,30 @@ body.dark .tgl { background: rgba(120, 120, 128, 0.4); }
   white-space: nowrap;
 }
 
-::-webkit-scrollbar { width: 0; height: 0; }
+/* ========== 第三刀:行首线条图标 ========== */
+.row-lead { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.row-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--text-sub);
+  flex-shrink: 0;
+}
+.row-ic svg { width: 18px; height: 18px; }
+.ic-tile {
+  width: 29px;
+  height: 29px;
+  border-radius: 8px;
+  background: var(--press);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-main);
+  margin-right: 11px;
+  flex-shrink: 0;
+}
+.ic-tile svg { width: 17px; height: 17px; }
 
+::-webkit-scrollbar { width: 0; height: 0; }
