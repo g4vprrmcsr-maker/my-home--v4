@@ -1161,14 +1161,14 @@ async function buildMsgRow(m, gi, aiSrc, userSrc) {
     footer.appendChild(vs);
   }
 
-  if (!isUser && m.tokens && st.showToken && (!gi.inGroup || gi.isLast)) {
+    if (!isUser && m.tokens && st.showToken && !(st.msgBarOn && st.tokenInBar) && (!gi.inGroup || gi.isLast)) {
     const tk = document.createElement("span");
     tk.textContent = m.tokens + " tokens";
     footer.appendChild(tk);
   }
 
   body.appendChild(bubble);
-  if (st.msgBarOn) {
+  if (st.msgBarOn && (!gi.inGroup || gi.isLast)) {
     const gv = st.skin === "night" ? Math.min(255, st.metaShade + 60) : st.metaShade;
     const bar = document.createElement("div");
     bar.className = "msg-toolbar";
@@ -1210,6 +1210,12 @@ async function buildMsgRow(m, gi, aiSrc, userSrc) {
         }) });
       showActions(items, ev.clientX, ev.clientY);
     });
+    if (!isUser && st.tokenInBar && st.showToken && m.tokens) {
+      const tk = document.createElement("span");
+      tk.textContent = m.tokens + " tokens";
+      tk.style.cssText = "font-family:" + FONT_LIST[st.metaFont] + ";font-size:" + st.metaSize + "px;font-weight:" + st.metaWeight + ";";
+      bar.appendChild(tk);
+    }
     body.appendChild(bar);
   }
   body.appendChild(footer);
@@ -1693,9 +1699,22 @@ async function sendMessage() {
   await runStream(aiMsg, buildMessages(aiMsg.id));
 }
 
-/* ---------- 重roll ---------- */
+/* ---------- 重roll:分段组先收拢成一条 ---------- */
 async function regenerate(m) {
   if (streaming) return;
+  const s = curSession();
+  if (m.grp) {
+    const gid = m.grp;
+    const members = s.messages.filter(x => x.grp === gid);
+    const first = members[0];
+    first.versions = [members.map(x => msgText(x)).join(NL + NL)];
+    first.vi = 0;
+    first.tokens = m.tokens || first.tokens;
+    delete first.grp;
+    s.messages = s.messages.filter(x => x.grp !== gid);
+    saveState();
+    m = first;
+  }
   m.versions.push("");
   m.vi = m.versions.length - 1;
   await runStream(m, buildMessages(m.id), true);
