@@ -2561,6 +2561,48 @@ function mkSection(parent, title) {
   parent.appendChild(wrap);
   return sec;
 }
+function mkPickRow(parent, label, opts, getV, setV) {
+  const row = el("div", "pick-row");
+  row.appendChild(el("span", "pick-label", label));
+  const val = el("span", "pick-val");
+  function refresh() {
+    const cur = opts.find(o => o.v === getV());
+    val.textContent = (cur ? cur.name : "") + " ›";
+  }
+  row.appendChild(val);
+  row.onclick = (e) => {
+    document.querySelectorAll(".pick-menu").forEach(x => x.remove());
+    const menu = el("div", "pick-menu");
+    opts.forEach(o => {
+      const it = el("div", "pick-item" + (o.v === getV() ? " on" : ""), o.name);
+      it.onclick = (ev) => {
+        ev.stopPropagation();
+        menu.remove();
+        setV(o.v);
+        refresh();
+      };
+      menu.appendChild(it);
+    });
+    document.body.appendChild(menu);
+    const r2 = menu.getBoundingClientRect();
+    menu.style.left = Math.max(8, Math.min(e.clientX, window.innerWidth - r2.width - 8)) + "px";
+    menu.style.top = Math.max(8, Math.min(e.clientY, window.innerHeight - r2.height - 8)) + "px";
+    setTimeout(() => {
+      const closer = (ev) => {
+        if (!menu.contains(ev.target)) {
+          menu.remove();
+          document.removeEventListener("touchstart", closer, true);
+          document.removeEventListener("click", closer, true);
+        }
+      };
+      document.addEventListener("touchstart", closer, true);
+      document.addEventListener("click", closer, true);
+    }, 80);
+  };
+  parent.appendChild(row);
+  refresh();
+  return refresh;
+}
 
 function mkSeg(parent, opts, getV, setV) {
   const isBool = opts.length === 2 && opts.every(o => typeof o.v === "boolean");
