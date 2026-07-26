@@ -2554,9 +2554,11 @@ function doExportTxt() {
 
 /* ---------- 控件工厂 ---------- */
 function mkSection(parent, title) {
-  const sec = el("div", "settings-section");
-  sec.appendChild(el("div", "section-title", title));
-  parent.appendChild(sec);
+  const wrap = el("div", "set-wrap");
+  if (title) wrap.appendChild(el("div", "set-group-title", title));
+  const sec = el("div", "settings-section set-card");
+  wrap.appendChild(sec);
+  parent.appendChild(wrap);
   return sec;
 }
 
