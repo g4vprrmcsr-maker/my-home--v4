@@ -111,7 +111,8 @@ function defaultSettings() {
     splitGap: 6,
     tokenInBar: false,
     bubblePresets: [],
-    avBubbleGap: 6
+    avBubbleGap: 6,
+    chatUi: "home"
   };
 
 
@@ -615,9 +616,19 @@ async function dressBubble(bubble, isUser) {
     } else {
       bubble.style.boxShadow = "0 1px 6px rgba(0,0,0,0.05)";
     }
+    if (st.bubbleTexture === "frost" && !tailed) {
+      bubble.style.backdropFilter = "blur(14px) saturate(1.4)";
+      bubble.style.webkitBackdropFilter = "blur(14px) saturate(1.4)";
+      bubble.style.boxShadow = "0 0 0 1px rgba(255,255,255,0.75), " + bubble.style.boxShadow;
+    }
     if (tailed) addTailClass(bg);
   } else {
-    if (st.bubbleTexture === "water") {
+    if (st.bubbleTexture === "frost") {
+      bubble.style.background = st.skin === "night" ? "rgba(60,60,64,0.35)" : "rgba(255,255,255,0.28)";
+      bubble.style.backdropFilter = "blur(14px) saturate(1.4)";
+      bubble.style.webkitBackdropFilter = "blur(14px) saturate(1.4)";
+      bubble.style.boxShadow = "0 0 0 1px rgba(255,255,255,0.75), 0 2px 10px rgba(0,0,0,0.05)";
+    } else if (st.bubbleTexture === "water") {
       bubble.style.background = "linear-gradient(155deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.14) 100%)";
       bubble.style.boxShadow = "inset 0 1px 1px rgba(255,255,255,0.5), 0 2px 10px rgba(0,0,0,0.04)";
     } else {
@@ -2568,7 +2579,7 @@ function mkSection(parent, title) {
 function lineIcon(kind) {
   const s = 'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"';
   const P = {
-    skin: '<circle cx="12" cy="12" r="8" ' + s + '/><path d="M12 4 a8 8 0 0 1 0 16 Z" fill="currentColor" opacity="0.18" stroke="none"/>',
+    skin: '<path d="M12 19.4 C8.1 16.5 4.9 13.5 4.6 10.3 C4.4 8 6 6.1 8.2 6 c1.5 -0.1 3 0.8 3.8 2.2 c0.7 -1.3 2 -2.2 3.5 -2.3 c2.2 -0.1 3.9 1.7 3.9 4 c0 3.3 -3.4 6.5 -7.4 9.5 Z" ' + s + '/>',
     sidebar: '<rect x="4" y="5" width="16" height="14" rx="2.5" ' + s + '/><path d="M9.5 5 v14" ' + s + '/>',
     globe: '<circle cx="12" cy="12" r="8" ' + s + '/><path d="M4 12 h16" ' + s + '/><path d="M12 4 c3 2.5 3 13.5 0 16 M12 4 c-3 2.5 -3 13.5 0 16" ' + s + '/>',
     drop: '<path d="M12 4.5 c-3.4 4 -5.4 6.7 -5.4 9.2 a5.4 5.4 0 0 0 10.8 0 c0 -2.5 -2 -5.2 -5.4 -9.2 Z" ' + s + '/>',
@@ -3041,7 +3052,7 @@ function buildTabBubble(body) {
   const sec = mkSection(body, "气泡");
   sec.appendChild(el("label", "form-label", "质感"));
   mkSeg(sec,
-    [{ v: "water", name: "水感液态" }, { v: "plain", name: "素面" }],
+    [{ v: "water", name: "水感液态" }, { v: "plain", name: "素面" }, { v: "frost", name: "毛玻璃（细白边）" }],
     () => state.settings.bubbleTexture,
     (v) => { state.settings.bubbleTexture = v; saveState(); renderMessages(); }
   );
