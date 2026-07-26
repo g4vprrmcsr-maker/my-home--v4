@@ -107,7 +107,9 @@ function defaultSettings() {
     nameDrop: 0,
     msgBarOn: true,
     nameMid: false,
-    msgBarGap: 8
+    msgBarGap: 8,
+    splitGap: 6,
+    tokenInBar: false
   };
 
 }
@@ -670,19 +672,26 @@ function dressMeta(row, isUser) {
   const metaBox = row.querySelector(".msg-meta");
   if (metaBox) {
     if (st.nameMid && st.showAvatar && st.bubbleAlign === "side") {
-      metaBox.style.minHeight = st.avatarSize + "px";
+      row.style.alignItems = "flex-start";
+      metaBox.style.height = st.avatarSize + "px";
+      metaBox.style.minHeight = "0";
       metaBox.style.display = "flex";
       metaBox.style.alignItems = "center";
       metaBox.style.gap = "6px";
+      metaBox.style.margin = "0";
       metaBox.style.justifyContent = isUser ? "flex-end" : "flex-start";
+      row.querySelectorAll(".msg-name").forEach(e => { e.style.transform = "none"; });
     } else {
+      row.style.alignItems = "";
+      metaBox.style.height = "";
       metaBox.style.minHeight = "";
       metaBox.style.display = "";
       metaBox.style.alignItems = "";
+      metaBox.style.gap = "";
+      metaBox.style.margin = "";
       metaBox.style.justifyContent = "";
     }
   }
-
 
   if (st.bubbleAlign === "below") {
     row.style.flexDirection = "column";
@@ -1211,6 +1220,10 @@ async function buildMsgRow(m, gi, aiSrc, userSrc) {
 
   await dressBubble(bubble, isUser);
   dressMeta(row, isUser);
+  if (gi.inGroup && !gi.isLast) {
+    row.style.marginBottom = (st.splitGap === undefined ? 6 : st.splitGap) + "px";
+  }
+
   if (hideAv) avatar.classList.add("ghost");
 
   if (st.showAvatar && !hideAv) {
@@ -2843,7 +2856,8 @@ function buildTabLayout(body) {
     (v) => { state.settings.avatarShape = v; saveState(); renderMessages(); }
   );
   mkSlider(sec, "头像大小", 20, 52, 1, "avatarSize", "px", () => { applyTheme(); renderMessages(); });
-  mkSlider(sec, "消息之间的间距", 4, 40, 1, "msgGap", "px", () => renderMessages());
+    mkSlider(sec, "消息之间的间距", 0, 40, 1, "msgGap", "px", () => renderMessages());
+  mkSlider(sec, "分段消息间距（同一轮连发）", 0, 30, 1, "splitGap", "px", () => renderMessages());
   mkSlider(sec, "小字与气泡的距离", 0, 20, 1, "metaGap", "px", () => renderMessages());
   mkSlider(sec, "输入框下移", 0, 34, 1, "inputLift", "", applyLayout);
   sec.appendChild(el("label", "form-label", "输入栏模型按钮"));
