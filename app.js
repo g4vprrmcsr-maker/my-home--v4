@@ -2242,12 +2242,12 @@ function buildSettingsExtras() {
 
 let settingsTab = "";
 const SETTINGS_SECTIONS = [
-  { k: "sec-api", name: "API设置" },
-  { k: "sec-param", name: "参数" },
-  { k: "sec-think", name: "思维链" },
-  { k: "sec-split", name: "分段发送" },
-  { k: "sec-bg", name: "背景" },
-  { k: "sec-data", name: "数据" }
+  { k: "sec-api", name: "API设置", ic: "api" },
+  { k: "sec-param", name: "参数", ic: "param" },
+  { k: "sec-think", name: "思维链", ic: "bulb" },
+  { k: "sec-split", name: "分段发送", ic: "split" },
+  { k: "sec-bg", name: "背景", ic: "bg" },
+  { k: "sec-data", name: "数据", ic: "data" }
 ];
 
 function buildSettingsMenu() {
@@ -2642,8 +2642,8 @@ function rowLead(text, cls) {
 }
 
 function mkPickRow(parent, label, opts, getV, setV) {
-  const row = el("div", "pick-row");
-  row.appendChild(rowLead(label, "pick-label"));
+    const row = el("div", "pick-row");
+    row.appendChild(rowLead(lbl, "pick-label"));
   const val = el("span", "pick-val");
   function refresh() {
     const cur = opts.find(o => o.v === getV());
@@ -2696,7 +2696,7 @@ function mkSeg(parent, opts, getV, setV) {
       prev.remove();
     }
     const row = el("div", "tgl-row");
-    row.appendChild(el("span", "tgl-label", lbl));
+    row.appendChild(rowLead(lbl, "tgl-label"));
     const t = el("button", "tgl");
     const onVal = opts[0].v === true ? opts[0].v : opts[1].v;
     function refresh() { t.classList.toggle("on", getV() === true); }
@@ -2796,24 +2796,11 @@ function mkSlider(parent, label, min, max, step, key, unit, after) {
 }
 
 function mkFontSelect(parent, label, key, after) {
-  const row = el("div", "form-row");
-  row.appendChild(el("label", "form-label", label));
-  const sel = document.createElement("select");
-  sel.className = "form-select";
-  Object.keys(FONT_NAMES).forEach(k => {
-    const o = document.createElement("option");
-    o.value = k;
-    o.textContent = FONT_NAMES[k];
-    if (state.settings[key] === k) o.selected = true;
-    sel.appendChild(o);
-  });
-  sel.onchange = () => {
-    state.settings[key] = sel.value;
-    saveState();
-    if (after) after();
-  };
-  row.appendChild(sel);
-  parent.appendChild(row);
+  mkPickRow(parent, label,
+    Object.keys(FONT_NAMES).map(k => ({ v: k, name: FONT_NAMES[k], font: FONT_LIST[k] })),
+    () => state.settings[key],
+    (v) => { state.settings[key] = v; saveState(); if (after) after(); }
+  );
 }
 
 /* ---------- 颜色区工厂 ---------- */
@@ -2972,12 +2959,12 @@ let themeTab = "";
 let bubbleSizeFold = true;
 
 const THEME_TABS = [
-  { k: "look", name: "皮肤" },
-  { k: "bubble", name: "气泡" },
-  { k: "layout", name: "布局" },
-  { k: "display", name: "显示" },
-  { k: "text", name: "文字" },
-  { k: "mem", name: "记忆手册" }
+  { k: "look", name: "皮肤", ic: "skin" },
+  { k: "bubble", name: "气泡", ic: "bubble" },
+  { k: "layout", name: "布局", ic: "layout" },
+  { k: "display", name: "显示", ic: "eye" },
+  { k: "text", name: "文字", ic: "font" },
+  { k: "mem", name: "记忆手册", ic: "mem" }
 ];
 
 function buildThemePanel() {
@@ -2992,8 +2979,11 @@ function buildThemePanel() {
     const wrap = el("div", "");
     wrap.style.cssText = "padding:14px 16px;";
     const list = el("div", "ios-list");
-    THEME_TABS.forEach(t => {
+      THEME_TABS.forEach(t => {
       const row = el("div", "ios-row");
+      const tile = el("div", "ic-tile");
+      tile.innerHTML = lineIcon(t.ic);
+      row.appendChild(tile);
       row.appendChild(el("span", "", t.name));
       row.appendChild(el("span", "ios-arrow", "›"));
       row.onclick = () => {
