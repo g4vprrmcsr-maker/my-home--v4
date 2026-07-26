@@ -1186,7 +1186,7 @@ async function buildMsgRow(m, gi, aiSrc, userSrc) {
     };
     mk("copy", () => copyText(msgText(m)));
     if (!isUser) mk("roll", () => regenerate(m));
-    mk("more", (ev) => {
+        mk("more", (ev) => {
       const items = [
         { label: "选择复制", fn: () => openSelectCopy(msgText(m)) },
         { label: "编辑消息", fn: () => inputDialog("编辑消息", msgText(m), v => {
@@ -1209,6 +1209,13 @@ async function buildMsgRow(m, gi, aiSrc, userSrc) {
           renderMessages();
         }) });
       showActions(items, ev.clientX, ev.clientY);
+      const mn = document.querySelector(".msg-actions");
+      if (mn) {
+        mn.style.display = "flex";
+        mn.style.flexDirection = "column";
+        mn.style.alignItems = "stretch";
+        mn.querySelectorAll(".act-btn").forEach(b3 => { b3.style.textAlign = "left"; });
+      }
     });
     if (!isUser && st.tokenInBar && st.showToken && m.tokens) {
       const tk = document.createElement("span");
