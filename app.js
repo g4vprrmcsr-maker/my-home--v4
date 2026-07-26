@@ -2199,6 +2199,7 @@ function buildSettingsExtras() {
 
   const sb = $("#split-body");
   sb.innerHTML = "";
+  sb.appendChild(el("label", "form-label", "总开关"));
   mkSeg(sb,
     [{ v: false, name: "关闭" }, { v: true, name: "开启" }],
     () => state.settings.splitSend,
@@ -2268,8 +2269,11 @@ function buildSettingsMenu() {
   if (!settingsTab) {
     $("#settings-title").textContent = "设置";
     const list = el("div", "ios-list");
-    SETTINGS_SECTIONS.forEach(t => {
+        SETTINGS_SECTIONS.forEach(t => {
       const row = el("div", "ios-row");
+      const tile = el("div", "ic-tile");
+      tile.innerHTML = lineIcon(t.ic);
+      row.appendChild(tile);
       row.appendChild(el("span", "", t.name));
       row.appendChild(el("span", "ios-arrow", "›"));
       row.onclick = () => {
