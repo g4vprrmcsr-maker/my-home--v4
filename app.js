@@ -2920,6 +2920,13 @@ function buildTabDisplay(body) {
     () => state.settings.showToken,
     (v) => { state.settings.showToken = v; saveState(); renderMessages(); }
   );
+  sec.appendChild(el("label", "form-label", "token位置"));
+  mkSeg(sec,
+    [{ v: false, name: "消息下方" }, { v: true, name: "操作栏同一排" }],
+    () => state.settings.tokenInBar,
+    (v) => { state.settings.tokenInBar = v; saveState(); renderMessages(); }
+  );
+
   sec.appendChild(el("label", "form-label", "双方昵称"));
   mkSeg(sec,
     [{ v: true, name: "显示" }, { v: false, name: "不显示" }],
