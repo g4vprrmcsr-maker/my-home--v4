@@ -110,8 +110,10 @@ function defaultSettings() {
     msgBarGap: 8,
     splitGap: 6,
     tokenInBar: false,
-    bubblePresets: []
+    bubblePresets: [],
+    avBubbleGap: 6
   };
+
 
 
 }
@@ -696,7 +698,10 @@ function dressMeta(row, isUser) {
 
   if (st.bubbleAlign === "below") {
     row.style.flexDirection = "column";
-    row.style.gap = "4px";
+    row.style.gap = (st.avBubbleGap === undefined ? 6 : st.avBubbleGap) + "px";
+    if (av && av.classList.contains("ghost")) {
+      av.style.display = "none";
+    }
     if (av && bodyEl) {
       av.style.alignSelf = isUser ? "flex-end" : "flex-start";
       bodyEl.style.alignSelf = isUser ? "flex-end" : "flex-start";
@@ -719,7 +724,7 @@ function dressMeta(row, isUser) {
       metaBox.style.left = (st.avatarSize + 8) + "px";
     }
     if (bodyEl && st.bubbleAlign !== "below") {
-      bodyEl.style.paddingTop = (st.avatarSize + 6 + (st.metaGap || 0)) + "px";
+      bodyEl.style.paddingTop = (st.avatarSize + (st.avBubbleGap === undefined ? 6 : st.avBubbleGap)) + "px";
     }
     row.querySelectorAll(".msg-name").forEach(e => { e.style.transform = "none"; });
   }
@@ -2951,9 +2956,10 @@ function buildTabLayout(body) {
     (v) => { state.settings.avatarShape = v; saveState(); renderMessages(); }
   );
   mkSlider(sec, "头像大小", 20, 52, 1, "avatarSize", "px", () => { applyTheme(); renderMessages(); });
-    mkSlider(sec, "消息之间的间距", 0, 40, 1, "msgGap", "px", () => renderMessages());
+  mkSlider(sec, "消息之间的间距", 0, 40, 1, "msgGap", "px", () => renderMessages());
   mkSlider(sec, "分段消息间距（同一轮连发）", 0, 30, 1, "splitGap", "px", () => renderMessages());
   mkSlider(sec, "小字与气泡的距离", 0, 20, 1, "metaGap", "px", () => renderMessages());
+  mkSlider(sec, "头像与气泡的呼吸距离", 0, 30, 1, "avBubbleGap", "px", () => renderMessages());
   mkSlider(sec, "输入框下移", 0, 34, 1, "inputLift", "", applyLayout);
   sec.appendChild(el("label", "form-label", "输入栏模型按钮"));
   mkSeg(sec,
