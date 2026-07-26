@@ -4265,12 +4265,14 @@ function renderBeautifyRoom(body) {
   dockTip.style.cssText = "font-size:11px;color:#aaa;margin:-4px 0 14px;";
   body.appendChild(dockTip);
 
-  body.appendChild(el("label", "form-label", "自定义app图标（先选一个，再传图）"));
-  mkSeg(body,
-    HOME_APPS.map(a => ({ v: a.k, name: a.label })),
-    () => iconScope,
-    (v) => { iconScope = v; reload(); }
-  );
+    body.appendChild(el("label", "form-label", "自定义app图标（先选一个，再传图）"));
+  const iconSegG = el("div", "seg-group");
+  HOME_APPS.forEach(a => {
+    const b = el("button", "seg-btn" + (iconScope === a.k ? " on" : ""), a.label);
+    b.onclick = () => { iconScope = a.k; reload(); };
+    iconSegG.appendChild(b);
+  });
+  body.appendChild(iconSegG);
   const curApp = HOME_APPS.find(a => a.k === iconScope);
   const iTip = el("div", "", "正在装修：「" + curApp.label + "」的图标");
   iTip.style.cssText = "font-size:12px;color:#aaa;margin:4px 2px 10px;";
