@@ -205,10 +205,6 @@ body {
   padding-top: calc(8px + env(safe-area-inset-top));
   background: transparent !important;
   z-index: 10;
-  pointer-events: none;
-}
-#topbar > * {
-  pointer-events: auto;
 }
 #topbar-left { display: flex; align-items: center; min-width: 0; }
 .topbar-btn {
