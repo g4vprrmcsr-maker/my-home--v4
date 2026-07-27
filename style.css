@@ -1453,14 +1453,56 @@ body.dark.gpt-ui #input-box {
   background: rgba(60, 60, 60, 0.45);
   box-shadow: 0 4px 18px rgba(0,0,0,0.2);
 }
-body.gpt-ui .input-toolbar { display: contents; }
-body.gpt-ui #attach-btn { order: 0; background: transparent; font-size: 20px; }
-body.gpt-ui #input-text { order: 1; flex: 1; }
-body.gpt-ui #model-btn { order: 2; max-width: 90px; }
-body.gpt-ui #mini-menu-btn { order: 3; }
-body.gpt-ui #send-btn { order: 4; width: 34px; height: 34px; background: #111; color: #fff; }
-body.dark.gpt-ui #send-btn { background: #eaeaea; color: #111; }
-body.gpt-ui .toolbar-spacer { display: none; }
+body.gpt-ui #input-box {
+  flex-direction: row;
+  align-items: center;
+}
+body.gpt-ui #input-text {
+  flex: 1;
+  order: unset;
+}
+body.gpt-ui .input-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0;
+  position: static;
+  z-index: auto;
+}
+body.gpt-ui #attach-btn {
+  background: transparent;
+  font-size: 20px;
+  order: unset;
+  position: relative;
+  z-index: 10;
+}
+body.gpt-ui #model-btn {
+  max-width: 90px;
+  order: unset;
+  position: relative;
+  z-index: 10;
+}
+body.gpt-ui #mini-menu-btn {
+  order: unset;
+  position: relative;
+  z-index: 10;
+}
+body.gpt-ui #send-btn {
+  width: 34px;
+  height: 34px;
+  background: #111;
+  color: #fff;
+  order: unset;
+  position: relative;
+  z-index: 10;
+}
+body.dark.gpt-ui #send-btn {
+  background: #eaeaea;
+  color: #111;
+}
+body.gpt-ui .toolbar-spacer {
+  display: none;
+}
 body.gpt-ui #input-text {
   touch-action: manipulation;
   -webkit-user-select: text;
@@ -1482,5 +1524,20 @@ body.gpt-ui #attach-btn {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+#send-btn,
+#attach-btn,
+#model-btn,
+#mini-menu-btn {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+}
+body.gpt-ui #send-btn,
+body.gpt-ui #attach-btn,
+body.gpt-ui #model-btn,
+body.gpt-ui #mini-menu-btn {
+  position: relative;
+  z-index: 10;
 }
 
