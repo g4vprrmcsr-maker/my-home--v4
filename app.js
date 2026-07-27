@@ -617,17 +617,18 @@ async function dressBubble(bubble, isUser) {
       bubble.style.boxShadow = "0 1px 6px rgba(0,0,0,0.05)";
     }
     if (st.bubbleTexture === "frost" && !tailed) {
-      bubble.style.backdropFilter = "blur(14px) saturate(1.4)";
-      bubble.style.webkitBackdropFilter = "blur(14px) saturate(1.4)";
-      bubble.style.boxShadow = "0 0 0 0.5px rgba(255,255,255,0.45), " + bubble.style.boxShadow;
+      bubble.style.backdropFilter = "blur(20px) saturate(1.6)";
+      bubble.style.webkitBackdropFilter = "blur(20px) saturate(1.6)";
+      bubble.style.border = "0.5px solid rgba(255,255,255,0.3)";
     }
     if (tailed) addTailClass(bg);
   } else {
     if (st.bubbleTexture === "frost") {
-      bubble.style.background = st.skin === "night" ? "rgba(60,60,64,0.35)" : "rgba(255,255,255,0.28)";
-      bubble.style.backdropFilter = "blur(14px) saturate(1.4)";
-      bubble.style.webkitBackdropFilter = "blur(14px) saturate(1.4)";
-      bubble.style.boxShadow = "0 0 0 0.5px rgba(255,255,255,0.4), 0 2px 10px rgba(0,0,0,0.05)";
+      bubble.style.background = st.skin === "night" ? "rgba(60,60,64,0.35)" : "rgba(255,255,255,0.45)";
+      bubble.style.backdropFilter = "blur(20px) saturate(1.6)";
+      bubble.style.webkitBackdropFilter = "blur(20px) saturate(1.6)";
+      bubble.style.border = "0.5px solid rgba(255,255,255,0.35)";
+      bubble.style.boxShadow = "0 1px 3px rgba(0,0,0,0.03), 0 4px 14px rgba(0,0,0,0.05)";
     } else if (st.bubbleTexture === "water") {
       bubble.style.background = "linear-gradient(155deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.14) 100%)";
       bubble.style.boxShadow = "inset 0 1px 1px rgba(255,255,255,0.5), 0 2px 10px rgba(0,0,0,0.04)";
