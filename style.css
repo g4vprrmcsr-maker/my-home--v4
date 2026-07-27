@@ -1391,7 +1391,6 @@ body.dark .tgl { background: rgba(120, 120, 128, 0.4); }
   flex-shrink: 0;
 }
 .ic-tile svg { width: 17px; height: 17px; }
-
 /* ========== 仿ChatGPT聊天界面 ========== */
 body.gpt-ui #topbar {
   background: transparent !important;
@@ -1451,16 +1450,9 @@ body.gpt-ui #mini-menu-btn { order: 3; }
 body.gpt-ui #send-btn { order: 4; width: 34px; height: 34px; background: #111; color: #fff; }
 body.dark.gpt-ui #send-btn { background: #eaeaea; color: #111; }
 body.gpt-ui .toolbar-spacer { display: none; }
-body.gpt-ui .input-toolbar { display: contents; }
-body.gpt-ui #attach-btn { order: 0; background: transparent; font-size: 20px; }
-body.gpt-ui #input-text { order: 1; flex: 1; }
-body.gpt-ui #model-btn { order: 2; max-width: 90px; }
-body.gpt-ui #mini-menu-btn { order: 3; }
-body.gpt-ui #send-btn { order: 4; width: 34px; height: 34px; background: #111; color: #fff; }
-body.dark.gpt-ui #send-btn { background: #eaeaea; color: #111; }
-body.gpt-ui .toolbar-spacer { display: none; }
 
 ::-webkit-scrollbar { width: 0; height: 0; }
+
 #attach-btn svg {
   display: block;
 }
