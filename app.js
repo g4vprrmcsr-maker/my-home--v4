@@ -886,6 +886,7 @@ function applyLayout() {
     title.style.left = "";
     title.style.transform = "";
     title.style.maxWidth = "";
+    tb.style.position = "";
   }
   const ia = $("#input-area");
   const lift = Math.max(0, 34 - st.inputLift);
