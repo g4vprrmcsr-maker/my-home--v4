@@ -1433,6 +1433,14 @@ body.gpt-ui #topbar-title {
   font-weight: 600;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 3px 12px rgba(0,0,0,0.06);
   margin-left: 10px;
+  position: static;
+}
+body.gpt-ui #topbar {
+  justify-content: flex-start;
+  gap: 10px;
+}
+body.gpt-ui .topbar-btn:last-child {
+  margin-left: auto;
 }
 body.dark.gpt-ui #topbar-title {
   background: rgba(60, 60, 60, 0.4);
