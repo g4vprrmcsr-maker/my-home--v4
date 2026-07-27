@@ -1484,44 +1484,21 @@ body.gpt-ui #mini-menu-btn {
 body.gpt-ui #send-btn {
   order: 4;
 }
-body.gpt-ui #input-text {
-  flex: 1;
-  order: unset;
-}
 body.gpt-ui .input-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 0;
-  position: static;
-  z-index: auto;
+  display: contents;
 }
 body.gpt-ui #attach-btn {
   background: transparent;
   font-size: 20px;
-  order: unset;
-  position: relative;
-  z-index: 10;
 }
 body.gpt-ui #model-btn {
   max-width: 90px;
-  order: unset;
-  position: relative;
-  z-index: 10;
-}
-body.gpt-ui #mini-menu-btn {
-  order: unset;
-  position: relative;
-  z-index: 10;
 }
 body.gpt-ui #send-btn {
   width: 34px;
   height: 34px;
   background: #111;
   color: #fff;
-  order: unset;
-  position: relative;
-  z-index: 10;
 }
 body.dark.gpt-ui #send-btn {
   background: #eaeaea;
@@ -1530,6 +1507,7 @@ body.dark.gpt-ui #send-btn {
 body.gpt-ui .toolbar-spacer {
   display: none;
 }
+
 body.gpt-ui #input-text {
   touch-action: manipulation;
   -webkit-user-select: text;
