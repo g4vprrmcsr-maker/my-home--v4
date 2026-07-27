@@ -204,8 +204,7 @@ body {
   right: 0;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
+  justify-content: space-between;
   padding: 8px 12px;
   padding-top: calc(8px + env(safe-area-inset-top));
   background: transparent;
@@ -235,12 +234,9 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
-  text-align: left;
+  margin-left: 2px;
 }
-.topbar-btn:last-child {
-  margin-left: auto;
-}
+
 body.skin-liquid #topbar {
   background: transparent;
   border-bottom: none;
@@ -1459,13 +1455,34 @@ body.dark.gpt-ui #input-box {
 }
 body.gpt-ui #input-box {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  flex-wrap: nowrap;
+  gap: 6px;
+  border-radius: 28px;
+  padding: 8px 8px 8px 6px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(16px) saturate(1.5);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+}
+body.dark.gpt-ui #input-box {
+  background: rgba(60, 60, 60, 0.45);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
 }
 body.gpt-ui #attach-btn {
-  order: -1;
-  flex-shrink: 0;
+  order: 0;
+}
+body.gpt-ui #input-text {
+  order: 1;
+  flex: 1;
+}
+body.gpt-ui #model-btn {
+  order: 2;
+}
+body.gpt-ui #mini-menu-btn {
+  order: 3;
+}
+body.gpt-ui #send-btn {
+  order: 4;
 }
 body.gpt-ui #input-text {
   flex: 1;
