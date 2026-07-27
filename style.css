@@ -204,7 +204,8 @@ body {
   right: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 8px;
   padding: 8px 12px;
   padding-top: calc(8px + env(safe-area-inset-top));
   background: transparent;
@@ -212,7 +213,6 @@ body {
   border: none;
   box-shadow: none;
 }
-
 
 .topbar-btn {
   width: 36px; height: 36px;
@@ -235,7 +235,11 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-left: 2px;
+  flex: 1;
+  text-align: left;
+}
+.topbar-btn:last-child {
+  margin-left: auto;
 }
 body.skin-liquid #topbar {
   background: transparent;
@@ -1454,8 +1458,14 @@ body.dark.gpt-ui #input-box {
   box-shadow: 0 4px 18px rgba(0,0,0,0.2);
 }
 body.gpt-ui #input-box {
+  display: flex;
   flex-direction: row;
   align-items: center;
+  flex-wrap: nowrap;
+}
+body.gpt-ui #attach-btn {
+  order: -1;
+  flex-shrink: 0;
 }
 body.gpt-ui #input-text {
   flex: 1;
