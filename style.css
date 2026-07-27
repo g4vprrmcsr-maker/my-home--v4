@@ -1465,4 +1465,14 @@ body.dark.gpt-ui #send-btn { background: #eaeaea; color: #111; }
 body.gpt-ui .toolbar-spacer { display: none; }
 
 ::-webkit-scrollbar { width: 0; height: 0; }
+#attach-btn svg {
+  display: block;
+}
+body.gpt-ui #attach-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
