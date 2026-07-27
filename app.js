@@ -875,7 +875,8 @@ function applyLayout() {
   const st = state.settings;
   const tb = $("#topbar");
   const title = $("#topbar-title");
-  if (st.titleCenter) {
+    if (st.titleCenter) {
+    tb.classList.add("title-centered");
     tb.style.position = "relative";
     tb.style.background = "transparent";
     tb.style.border = "none";
@@ -885,6 +886,7 @@ function applyLayout() {
     title.style.transform = "translateX(-50%)";
     title.style.maxWidth = "50%";
   } else {
+    tb.classList.remove("title-centered");
     tb.style.position = "";
     tb.style.background = "";
     tb.style.border = "";
