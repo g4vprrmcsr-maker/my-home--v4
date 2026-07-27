@@ -876,17 +876,23 @@ function applyLayout() {
   const tb = $("#topbar");
   const title = $("#topbar-title");
   if (st.titleCenter) {
+    tb.style.position = "relative";
+    tb.style.background = "transparent";
+    tb.style.border = "none";
+    tb.style.boxShadow = "none";
     title.style.position = "absolute";
     title.style.left = "50%";
     title.style.transform = "translateX(-50%)";
     title.style.maxWidth = "50%";
-    tb.style.position = "relative";
   } else {
+    tb.style.position = "";
+    tb.style.background = "";
+    tb.style.border = "";
+    tb.style.boxShadow = "";
     title.style.position = "";
     title.style.left = "";
     title.style.transform = "";
     title.style.maxWidth = "";
-    tb.style.position = "";
   }
   const ia = $("#input-area");
   const lift = Math.max(0, 34 - st.inputLift);
