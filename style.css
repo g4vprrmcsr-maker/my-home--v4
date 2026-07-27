@@ -1433,19 +1433,17 @@ body.gpt-ui #topbar-title {
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
   border-radius: 999px;
   padding: 10px 20px;
-  font-size: 15px;
-  font-weight: 600;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 3px 12px rgba(0,0,0,0.06);
   margin-left: 10px;
   position: static;
 }
-body.gpt-ui #topbar.title-centered #topbar-title {
+#topbar.title-centered #topbar-title {
   margin-left: 0;
 }
-body.gpt-ui #topbar.title-centered {
+#topbar.title-centered {
   gap: 0;
 }
-body.gpt-ui #topbar.title-centered .topbar-btn:last-child {
+#topbar.title-centered .topbar-btn:last-child {
   margin-left: 0;
   position: absolute;
   right: 12px;
@@ -1568,4 +1566,8 @@ body.gpt-ui #mini-menu-btn {
   position: relative;
   z-index: 10;
 }
+.menu-icon-classic { display: block; }
+.menu-icon-gpt { display: none; }
+body.gpt-ui .menu-icon-classic { display: none; }
+body.gpt-ui .menu-icon-gpt { display: block; }
 
