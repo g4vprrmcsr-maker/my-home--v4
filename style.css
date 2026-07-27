@@ -1441,6 +1441,14 @@ body.gpt-ui #topbar-title {
 body.gpt-ui #topbar.title-centered #topbar-title {
   margin-left: 0;
 }
+body.gpt-ui #topbar.title-centered {
+  gap: 0;
+}
+body.gpt-ui #topbar.title-centered .topbar-btn:last-child {
+  margin-left: 0;
+  position: absolute;
+  right: 12px;
+}
 body.gpt-ui #topbar {
   justify-content: flex-start;
   gap: 10px;
