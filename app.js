@@ -619,7 +619,7 @@ async function dressBubble(bubble, isUser) {
     if (st.bubbleTexture === "frost" && !tailed) {
       bubble.style.backdropFilter = "blur(14px) saturate(1.4)";
       bubble.style.webkitBackdropFilter = "blur(14px) saturate(1.4)";
-      bubble.style.boxShadow = "0 0 0 1px rgba(255,255,255,0.75), " + bubble.style.boxShadow;
+      bubble.style.boxShadow = "0 0 0 0.5px rgba(255,255,255,0.45), " + bubble.style.boxShadow;
     }
     if (tailed) addTailClass(bg);
   } else {
@@ -627,7 +627,7 @@ async function dressBubble(bubble, isUser) {
       bubble.style.background = st.skin === "night" ? "rgba(60,60,64,0.35)" : "rgba(255,255,255,0.28)";
       bubble.style.backdropFilter = "blur(14px) saturate(1.4)";
       bubble.style.webkitBackdropFilter = "blur(14px) saturate(1.4)";
-      bubble.style.boxShadow = "0 0 0 1px rgba(255,255,255,0.75), 0 2px 10px rgba(0,0,0,0.05)";
+      bubble.style.boxShadow = "0 0 0 0.5px rgba(255,255,255,0.4), 0 2px 10px rgba(0,0,0,0.05)";
     } else if (st.bubbleTexture === "water") {
       bubble.style.background = "linear-gradient(155deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.14) 100%)";
       bubble.style.boxShadow = "inset 0 1px 1px rgba(255,255,255,0.5), 0 2px 10px rgba(0,0,0,0.04)";
@@ -856,13 +856,14 @@ function applyTheme() {
     tbs.id = "topbar-style";
     document.head.appendChild(tbs);
   }
-  const tAlpha = (st.topbarAlpha === undefined ? 100 : st.topbarAlpha) / 100;
+    const tAlpha = (st.topbarAlpha === undefined ? 100 : st.topbarAlpha) / 100;
   if (tAlpha >= 1) {
     tbs.textContent = "";
+  } else if (tAlpha < 0.01) {
+    tbs.textContent = "#topbar{background:transparent!important;border-bottom-color:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}";
   } else {
     const tbase = st.skin === "night" ? "30,30,32" : "255,255,255";
-    tbs.textContent = "#topbar{background:rgba(" + tbase + "," + tAlpha.toFixed(2) + ")!important;" +
-      (tAlpha < 0.05 ? "border-bottom-color:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;" : "") + "}";
+    tbs.textContent = "#topbar{background:rgba(" + tbase + "," + tAlpha.toFixed(2) + ")!important;backdrop-filter:blur(12px) saturate(1.4)!important;-webkit-backdrop-filter:blur(12px) saturate(1.4)!important;}";
   }
 
   $("#model-btn").classList.toggle("hidden", !st.showModelBtn);
@@ -2942,7 +2943,7 @@ function mkColorArea(parent, label, hueKey, satKey, lightKey, alphaKey, onChange
     mkSliderX(slBox, "鲜艳度", 0, 100, 1, satKey, "%");
     mkSliderX(slBox, "深浅", 0, 100, 1, lightKey, "%");
     if (state.settings[alphaKey] !== undefined) {
-      mkSliderX(slBox, "不透明度", 15, 100, 1, alphaKey, "%");
+    mkSliderX(slBox, "不透明度", 0, 100, 1, alphaKey, "%");
     }
   }
 
