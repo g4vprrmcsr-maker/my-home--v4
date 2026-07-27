@@ -1,7 +1,6 @@
 /* ==========================================
    my home style.css v200
    ========================================== */
-
 :root {
   --bg: #ffffff;
   --bg-panel: #ffffff;
@@ -16,8 +15,6 @@
   --msg-fs: 14px;
   --avatar-size: 30px;
   --glass-blur: 14px;
-  --title-fs: 15px;
-  --title-fw: 600;
   --dock-drop: 8px;
 }
 
@@ -239,8 +236,8 @@ body.dark .topbar-btn {
 .topbar-btn:active { opacity: 0.7; }
 
 #topbar-title {
-  font-size: var(--title-fs);
-  font-weight: var(--title-fw);
+  font-size: var(--title-fs, 15px);
+  font-weight: var(--title-fw, 600);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -252,6 +249,7 @@ body.dark .topbar-btn {
   box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 3px 12px rgba(0,0,0,0.06);
   margin-left: 10px;
 }
+
 body.dark #topbar-title {
   background: rgba(60, 60, 60, 0.4);
   box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 3px 12px rgba(0,0,0,0.2);
