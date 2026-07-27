@@ -206,7 +206,7 @@ body {
   background: transparent !important;
   z-index: 10;
 }
-#topbar-left { display: flex; align-items: center; min-width: 0; }
+
 .topbar-btn {
   width: 36px; height: 36px;
   border-radius: 50%;
