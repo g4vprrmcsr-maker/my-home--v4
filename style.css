@@ -198,6 +198,10 @@ body {
 #main { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; min-width: 0; }
 
 #topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -205,9 +209,10 @@ body {
   padding-top: calc(8px + env(safe-area-inset-top));
   background: transparent;
   z-index: 10;
-  border-bottom: none;
+  border: none;
   box-shadow: none;
 }
+
 
 .topbar-btn {
   width: 36px; height: 36px;
@@ -1456,6 +1461,15 @@ body.gpt-ui #mini-menu-btn { order: 3; }
 body.gpt-ui #send-btn { order: 4; width: 34px; height: 34px; background: #111; color: #fff; }
 body.dark.gpt-ui #send-btn { background: #eaeaea; color: #111; }
 body.gpt-ui .toolbar-spacer { display: none; }
+body.gpt-ui #input-text {
+  touch-action: manipulation;
+  -webkit-user-select: text;
+  user-select: text;
+}
+body.gpt-ui #send-btn {
+  cursor: pointer;
+  touch-action: manipulation;
+}
 
 ::-webkit-scrollbar { width: 0; height: 0; }
 
