@@ -32,7 +32,7 @@ body.dark {
 }
 
 body.skin-official {
-  --bg: #FAF9F5;
+  --bg: #FAFAF8;
   --bg-panel: #FDFCF9;
   --bg-input: rgba(255, 255, 255, 0.78);
   --text-main: #3d3929;
