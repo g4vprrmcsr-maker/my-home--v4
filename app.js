@@ -890,7 +890,7 @@ function applyLayout() {
   }
   const ia = $("#input-area");
   const lift = Math.max(0, 34 - st.inputLift);
-  ia.style.paddingBottom = lift + "px";
+  ia.style.paddingBottom = "calc(" + lift + "px + env(safe-area-inset-bottom) * 0.4)";
   document.documentElement.style.setProperty("--dock-drop", st.dockDrop + "px");
 }
 
