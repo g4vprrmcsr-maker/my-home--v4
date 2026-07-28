@@ -214,13 +214,13 @@ body {
   margin-left: auto;
 }
 .topbar-btn {
-  width: 40px; height: 40px;
+  width: 44px; height: 44px;
   border-radius: 50%;
   border: none;
   background: rgba(255, 255, 255, 0.35);
   backdrop-filter: blur(20px) saturate(1.8);
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 3px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.08);
   font-size: 19px;
   color: var(--text-main);
   display: flex;
@@ -231,7 +231,7 @@ body {
 }
 body.dark .topbar-btn {
   background: rgba(60, 60, 60, 0.4);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 3px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.18);
 }
 .topbar-btn:active { opacity: 0.7; }
 
@@ -241,18 +241,21 @@ body.dark .topbar-btn {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  box-sizing: border-box;
+  height: 44px;
+  display: flex;
+  align-items: center;
   background: rgba(255, 255, 255, 0.35);
   backdrop-filter: blur(20px) saturate(1.8);
   -webkit-backdrop-filter: blur(20px) saturate(1.8);
   border-radius: 999px;
-  padding: 10px 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 3px 12px rgba(0,0,0,0.06);
+  padding: 0 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.08);
   margin-left: 10px;
 }
-
 body.dark #topbar-title {
   background: rgba(60, 60, 60, 0.4);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 3px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.18);
 }
 
 body.skin-liquid #input-box {
@@ -401,7 +404,7 @@ body.export-mode .msg-check { display: block; }
 body.multi-mode .msg-check { display: block; }
 
 #input-area {
-  padding: 2px 12px 0;
+  padding: 2px 16px 0;
   background: transparent;
   transition: transform 0.18s ease-out;
 }
@@ -427,9 +430,9 @@ body.multi-mode .msg-check { display: block; }
   background: var(--bg-input);
   backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
-  border-radius: 20px;
+  border-radius: 28px;
   padding: 10px 12px 8px;
-  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.08);
   position: relative;
   overflow: hidden;
   margin-bottom: 2px;
@@ -469,7 +472,7 @@ body.gpt-ui #input-text {
 }
 .toolbar-spacer { flex: 1; }
 #attach-btn {
-  width: 28px; height: 28px;
+  width: 44px; height: 44px;
   border-radius: 50%;
   border: none;
   background: var(--press);
@@ -485,7 +488,9 @@ body.gpt-ui #input-text {
   border: none;
   background: var(--press);
   border-radius: 12px;
-  padding: 5px 10px;
+  padding: 0 14px;
+  height: 44px;
+  min-width: 44px;
   font-size: 12px;
   color: var(--text-sub);
   cursor: pointer;
@@ -498,7 +503,7 @@ body.gpt-ui #input-text {
 #model-btn.hidden { display: none; }
 #mini-menu-btn {
   flex-shrink: 0;
-  width: 30px; height: 28px;
+  width: 44px; height: 44px;
   border: none;
   background: transparent;
   color: var(--text-faint);
@@ -507,7 +512,7 @@ body.gpt-ui #input-text {
   cursor: pointer;
 }
 #send-btn {
-  width: 32px; height: 32px;
+  width: 44px; height: 44px;
   border-radius: 50%;
   border: none;
   background: var(--btn-main);
@@ -1516,8 +1521,8 @@ body.gpt-ui #model-btn {
   max-width: 90px;
 }
 body.gpt-ui #send-btn {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   background: #111;
   color: #fff;
 }
