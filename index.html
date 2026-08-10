@@ -3,50 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F7F7F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121213" media="(prefers-color-scheme: dark)">
 <title>Kelivo</title>
+<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="app" id="app">
   <header class="topbar" id="topbar">
-    <button class="appbar-btn" id="btn-drawer" aria-label="菜单"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h11M4 12h16M4 17h9"/></svg></button>
+    <button class="appbar-btn" id="btn-drawer" aria-label="菜单"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h13M4 12h16M4 17h9"/></svg></button>
     <div class="topbar-title">
       <div class="title-main" id="title-main">新对话</div>
       <button class="title-sub" id="title-sub">claude-opus-4-8 (Kiro)</button>
     </div>
     <div class="topbar-actions">
       <button class="appbar-btn" id="btn-minimap" aria-label="导航"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3Z"/><path d="M9 3v15M15 6v15"/></svg></button>
-      <button class="appbar-btn" id="btn-newchat" aria-label="新对话"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></svg></button>
+      <button class="appbar-btn" id="btn-newchat" aria-label="新对话"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="3.4 3"><circle cx="12" cy="12" r="9"/></svg></button>
     </div>
   </header>
 
-  <main class="messages" id="messages">
-    <!-- 助手消息示例 -->
-    <div class="msg assistant">
-      <div class="msg-head">
-        <div class="avatar model-avatar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4M9 14h.01M15 14h.01"/></svg></div>
-        <div class="msg-head-col"><span class="msg-name">claude-opus-4-8</span><span class="msg-time">2026-08-09 05:00:14</span></div>
-      </div>
-      <div class="cot-card open">
-        <div class="cot-head"><span class="cot-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M15 14c.2-1 .7-1.7 1.4-2.5A4.6 4.6 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/></svg></span><span class="cot-ttl">深度思考</span><span class="cot-dur">(1.3s)</span><span class="cot-chev"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></div>
-        <div class="cot-body">用户在测试思维链折叠卡的样式，我需要保证这里可以展开收起。</div>
-      </div>
-      <div class="assistant-body"><p>这里是助手回复正文（裸文本、无背景）。</p></div>
-      <div class="msg-actions">
-        <button class="msg-act" aria-label="复制"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button>
-        <button class="msg-act" aria-label="重新生成"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
-        <button class="msg-act" aria-label="朗读"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15 9a3 3 0 0 1 0 6"/></svg></button>
-        <button class="msg-act" aria-label="翻译"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></svg></button>
-        <button class="msg-act" aria-label="更多"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></button>
-        <span class="tok-stat">17 tok</span>
-      </div>
-    </div>
-    <!-- 用户消息示例 -->
-    <div class="msg user">
-      <div class="msg-head"><span class="msg-name">用户</span><span class="msg-time">2026-08-09 05:08:50</span><div class="avatar user-avatar"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div></div>
-      <div class="user-bubble">?</div>
-    </div>
-  </main>
+  <main class="messages" id="messages"></main>
 
   <footer class="input-area" id="input-area">
     <div class="tools-panel" id="tools-panel" hidden></div>
@@ -54,13 +34,13 @@
       <textarea class="input-field" id="input-field" rows="1" placeholder="输入消息与AI聊天"></textarea>
       <div class="action-row">
         <div class="action-left">
-          <button class="cbtn model-btn" id="btn-model" aria-label="模型"><span class="model-brand"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2c.5 3.5 2 5 5.5 5.5C14 8 12.5 9.5 12 13c-.5-3.5-2-5-5.5-5.5C10 7 11.5 5.5 12 2Z"/><path d="M12 11c.4 2.8 1.6 4 4.4 4.4-2.8.4-4 1.6-4.4 4.4-.4-2.8-1.6-4-4.4-4.4C10.4 15 11.6 13.8 12 11Z"/></svg></span></button>
+          <button class="cbtn model-btn" id="btn-model" aria-label="模型"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2c.45 3.6 1.95 5.1 5.5 5.55C13.95 8 12.45 9.5 12 13.1 11.55 9.5 10.05 8 6.5 7.55 10.05 7.1 11.55 5.6 12 2Z"/><path d="M18.5 12.5c.28 2.1 1.12 2.94 3.2 3.22-2.08.28-2.92 1.12-3.2 3.2-.28-2.08-1.12-2.92-3.2-3.2 2.08-.28 2.92-1.12 3.2-3.22Z"/></svg></button>
           <button class="cbtn" id="btn-search" aria-label="搜索"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10Z"/></svg></button>
           <button class="cbtn" id="btn-reason" aria-label="推理"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M15 14c.2-1 .7-1.7 1.4-2.5A4.6 4.6 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/></svg></button>
           <button class="cbtn" id="btn-mcp" aria-label="工具"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5a2.1 2.1 0 0 1-3-3L12 9"/><path d="M17.6 15 22 10.6"/><path d="m20.9 11.7-1.2-1.2c-.6-.6-1-1.4-1-2.3v-.8L16 4.6A5.6 5.6 0 0 0 12 3H9l.9.8A6.2 6.2 0 0 1 12 8.4V10l2 2h.9c.8 0 1.6.3 2.2.9l1.3 1.3"/></svg></button>
         </div>
         <div class="action-right">
-          <button class="cbtn" id="btn-more" aria-label="更多"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button class="cbtn more-btn" id="btn-more" aria-label="更多"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
           <button class="send-btn" id="btn-send" aria-label="发送" disabled><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
         </div>
       </div>
@@ -68,7 +48,6 @@
   </footer>
 </div>
 
-<!-- 侧边栏 -->
 <div class="scrim" id="scrim" hidden></div>
 <aside class="drawer" id="drawer">
   <div class="drawer-top">
@@ -96,6 +75,10 @@
 <div class="sheet-host" id="sheet-host" hidden></div>
 <div class="toast" id="toast" hidden></div>
 
+<script>
+/* 修正旧版本残留脏数据（model 缺 name、旧字段等），消除“undefined”标题 */
+try{var _k=JSON.parse(localStorage.getItem('kelivo'));if(_k){if(!_k.model||!_k.model.name){_k.model={provider:'Kiro',pid:'kiro',id:'claude-opus-4-8',name:'claude-opus-4-8'};}if(_k.settings){_k.settings.showProviderName=false;}localStorage.setItem('kelivo',JSON.stringify(_k));}}catch(e){}
+</script>
 <script src="app.js"></script>
 </body>
 </html>
