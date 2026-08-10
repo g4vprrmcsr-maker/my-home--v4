@@ -775,6 +775,49 @@ function sendGlyphHtml() {
   return "↑";
 }
 
+/* ---------- Kelivo 整套排版：写进你原生 settings，1:1 原值，套完仍可用滑块调 ---------- */
+const KV_KEYS = ["avatarShape","avatarSize","showAvatar","showName","showTime",
+  "nameSize","nameWeight","timeFmt","timeAt","metaSize","metaShade",
+  "bubbleAlign","nameMid","msgGap","metaGap","avBubbleGap","msgBarGap",
+  "aiBare","bubbleShape","bubbleRadius","bubblePadV","bubblePadH","bubbleMaxW",
+  "bubbleTexture","bubbleGlow","userHue","userSat","userLight","userAlpha","aiHue",
+  "fontSize","chatWeight","chatLineH","paraGap","msgBarOn","showToken","tokenInBar"];
+function snapshotKvLayout() { const o = {}; KV_KEYS.forEach(k => o[k] = state.settings[k]); return o; }
+function restoreKvLayout(bk) { if (!bk) return; KV_KEYS.forEach(k => { if (bk[k] !== undefined) state.settings[k] = bk[k]; }); }
+function applyKelivoLayout() {
+  const st = state.settings;
+  st.avatarShape = "circle"; st.avatarSize = 32;
+  st.showAvatar = true; st.showName = true; st.showTime = true;
+  st.nameSize = 13; st.nameWeight = 500;
+  st.timeFmt = "ymd"; st.timeAt = "above"; st.metaSize = 11; st.metaShade = 150;
+  st.bubbleAlign = "side"; st.nameMid = false;
+  st.msgGap = 12; st.metaGap = 5; st.avBubbleGap = 8; st.msgBarGap = 8;
+  st.aiBare = true;
+  st.bubbleShape = "round-lg"; st.bubbleRadius = 16;
+  st.bubblePadV = 12; st.bubblePadH = 12; st.bubbleMaxW = 75;
+  st.bubbleTexture = "plain"; st.bubbleGlow = 0;
+  st.userHue = 225; st.userSat = 28; st.userLight = 93; st.userAlpha = 100;
+  st.aiHue = -1;
+  st.fontSize = 15.5; st.chatWeight = 400; st.chatLineH = 1.5; st.paraGap = 8;
+  st.msgBarOn = true; st.showToken = true; st.tokenInBar = true;
+  saveState();
+}
+function paintTopbarTitle() {
+  const tt = $("#topbar-title");
+  if (!tt) return;
+  if (state.settings.chatUi === "kelivo") {
+    tt.innerHTML = "";
+    const t1 = el("div", "", curSession().name);
+    t1.style.cssText = "line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
+    const p = curProvider();
+    const t2 = el("div", "", (p.model || "") + (p.name ? " (" + p.name + ")" : ""));
+    t2.style.cssText = "font-size:11px;font-weight:400;line-height:1.15;margin-top:2px;color:color-mix(in srgb,var(--text-main) 55%,transparent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
+    tt.appendChild(t1); tt.appendChild(t2);
+  } else {
+    tt.textContent = curSession().name;
+  }
+}
+
 /* ---------- 皮肤引擎 ---------- */
 function applyTheme() {
   const st = state.settings;
@@ -790,6 +833,7 @@ function applyTheme() {
   document.documentElement.style.setProperty("--title-fw", String(st.titleFw));
 
   document.body.classList.toggle("gpt-ui", st.chatUi === "gpt");
+  document.body.classList.toggle("skin-kelivo", st.chatUi === "kelivo");
   const sbtn = $("#send-btn");
   if (sbtn && !streaming) sbtn.innerHTML = sendGlyphHtml();
   const ib = $("#input-box");
@@ -2070,7 +2114,7 @@ function renderSidebar() {
     });
     list.appendChild(div);
   });
-  $("#topbar-title").textContent = curSession().name;
+  paintTopbarTitle();
   $("#current-role-name").textContent = r.name;
   avatarSrc("ai").then(src => { $("#current-role-avatar").src = src; });
 }
@@ -2333,6 +2377,7 @@ function drawModelOptions(filter) {
 
 function renderModelBtn() {
   $("#model-btn").textContent = curProvider().model || "选择模型";
+  paintTopbarTitle();
 }
 
 function toggleModelPopup() {
@@ -3321,10 +3366,22 @@ function buildTabLook(body) {
   );
   mkSlider(sec, "主题润度", 0, 100, 1, "skinGlow", "", applyTheme);
   mkSlider(sec, "全局降亮（觉得刺眼往右拉）", 0, 30, 1, "globalDim", "%", applyTheme);
-  mkPickRow(sec, "聊天界面",
-    [{ v: "home", name: "经典" }, { v: "gpt", name: "简约" }],
+    mkPickRow(sec, "聊天界面",
+    [{ v: "home", name: "经典" }, { v: "gpt", name: "简约" }, { v: "kelivo", name: "Kelivo" }],
     () => state.settings.chatUi,
-    (v) => { state.settings.chatUi = v; saveState(); applyTheme(); }
+    (v) => {
+      const prev = state.settings.chatUi;
+      if (v === "kelivo" && prev !== "kelivo") state.settings._kvBackup = snapshotKvLayout();
+      if (v !== "kelivo" && prev === "kelivo") { restoreKvLayout(state.settings._kvBackup); state.settings._kvBackup = null; }
+      state.settings.chatUi = v;
+      if (v === "kelivo") applyKelivoLayout();
+      saveState();
+      applyTheme();
+      applyChatTypo();
+      applyBubbleBox();
+      paintTopbarTitle();
+      renderMessages();
+    }
   );
 
   sec = mkSection(body, "侧边栏");
