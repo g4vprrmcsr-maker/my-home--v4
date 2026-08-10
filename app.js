@@ -1,25 +1,16 @@
 (function(){
 'use strict';
-
-/* ================= 数据 ================= */
 const DEF={
- settings:{mode:'system',
-  showUserAvatar:true,showUserName:true,showUserTime:true,showUserActions:true,
-  showModelIcon:true,newAssistantAvatarUx:false,showModelName:true,showModelTime:true,
-  showProviderName:false,showTokenStats:true,bubbleStyle:'default',
-  autoCollapseThinking:true,collapseThinkingSteps:true,toolResultSummary:true,
-  regenDeleteAfter:true,enterToSend:true,chatFontScale:1,autoScrollIdle:8,
-  userMarkdown:false,assistantMarkdown:true,latex:true},
+ settings:{mode:'system',showUserAvatar:true,showUserName:true,showUserTime:true,showUserActions:true,
+  showModelIcon:true,showModelName:true,showModelTime:true,showProviderName:false,showTokenStats:true,
+  bubbleStyle:'default',autoCollapseThinking:true,collapseThinkingSteps:true,toolResultSummary:true,
+  regenDeleteAfter:true,enterToSend:true,chatFontScale:1,autoScrollIdle:8,userMarkdown:false,assistantMarkdown:true,latex:true,search:false,reason:false},
  userName:'用户',
- assistants:[{id:'a1',name:'默认助手',prompt:'你是一个乐于助人的助手。',
-   temperature:0.6,topP:null,contextMessages:64,thinkingBudget:0,maxTokens:null,
-   useAvatar:false,useName:false,streaming:true,memory:[],phrases:[],chatModel:null,background:null}],
+ assistants:[{id:'a1',name:'默认助手',prompt:'你是一个乐于助人的助手。',temperature:0.6,topP:null,contextMessages:64,thinkingBudget:0,maxTokens:null,useAvatar:false,useName:false,streaming:true,memory:[],phrases:[],chatModel:null,background:null}],
  curA:'a1',
  providers:[
   {id:'openai',name:'OpenAI',type:'OpenAI',group:'其他',apiKey:'',baseUrl:'https://api.openai.com/v1',apiPath:'/chat/completions',enabled:true,multiKey:false,responseApi:false,
-   models:[{id:'gpt-4o',name:'gpt-4o',fav:true,cap:{chat:true,vision:true,tool:true,reason:false}},
-           {id:'gpt-4o-mini',name:'gpt-4o-mini',fav:false,cap:{chat:true,vision:true,tool:true,reason:false}},
-           {id:'o1',name:'o1',fav:false,cap:{chat:true,vision:false,tool:false,reason:true}}]},
+   models:[{id:'gpt-4o',name:'gpt-4o',fav:true,cap:{chat:true,vision:true,tool:true,reason:false}},{id:'gpt-4o-mini',name:'gpt-4o-mini',fav:false,cap:{chat:true,vision:true,tool:true,reason:false}},{id:'o1',name:'o1',fav:false,cap:{chat:true,vision:false,tool:false,reason:true}}]},
   {id:'kiro',name:'Kiro',type:'OpenAI',group:'其他',apiKey:'',baseUrl:'https://api.kiro.dev/v1',apiPath:'/chat/completions',enabled:true,multiKey:false,responseApi:false,
    models:[{id:'claude-opus-4-8',name:'claude-opus-4-8',fav:true,cap:{chat:true,vision:true,tool:true,reason:true}}]}
  ],
@@ -32,12 +23,10 @@ function load(){try{S=JSON.parse(localStorage.getItem('kelivo'))}catch(e){S=null
  S.settings=Object.assign({},DEF.settings,S.settings||{});
  if(!S.assistants||!S.assistants.length)S.assistants=JSON.parse(JSON.stringify(DEF.assistants));
  if(!S.providers||!S.providers.length)S.providers=JSON.parse(JSON.stringify(DEF.providers));
- if(!S.convs)S.convs=[];if(!S.model)S.model=JSON.parse(JSON.stringify(DEF.model));
+ if(!S.convs)S.convs=[];if(!S.model||!S.model.name)S.model=JSON.parse(JSON.stringify(DEF.model));
  if(!S.curA)S.curA=S.assistants[0].id;if(!S.userName)S.userName=DEF.userName;}
 const save=()=>{try{localStorage.setItem('kelivo',JSON.stringify(S))}catch(e){}};
 const uid=()=>Math.random().toString(36).slice(2,9);
-
-/* ================= 工具 ================= */
 const $=id=>document.getElementById(id);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
 const esc=s=>(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
@@ -46,25 +35,25 @@ function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout
 const curA=()=>S.assistants.find(a=>a.id===S.curA)||S.assistants[0];
 const curConv=()=>S.convs.find(c=>c.id===S.cur);
 const initial=s=>(s||'?').trim().slice(0,1).toUpperCase();
-
-/* 图标 */
 const IC={
  chev:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
- chevD:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+ chevD:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
  back:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>',
  plus:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
  trash:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>',
- copy:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
- regen:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>',
- tts:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15 9a3 3 0 0 1 0 6"/></svg>',
- trans:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></svg>',
- dots:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>',
+ copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
+ regen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>',
+ tts:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15 9a3 3 0 0 1 0 6"/></svg>',
+ trans:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></svg>',
+ dots:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>',
+ edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
  bot:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4M9 14h.01M15 14h.01"/></svg>',
  user:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+ idea:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M15 14c.2-1 .7-1.7 1.4-2.5A4.6 4.6 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/></svg>',
  sunmoon:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2M12 20v2M4 12H2M6.3 6.3 4.9 4.9M12 7a5 5 0 0 0 0 10 5 5 0 0 1 0-10Z"/></svg>',
  monitor:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
  heart:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.5-1.5 3-3.4 3-5.5A3.5 3.5 0 0 0 12 6 3.5 3.5 0 0 0 2 8.5c0 2.1 1.5 4 3 5.5l7 7Z"/></svg>',
- boxes:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.97 12.92 7 15v4l4 2v-4l-4-2-4-2Z"/><path d="m7 15 4-2 4 2-4 2Z"/><path d="M12 7 8 5 4 7l4 2Z"/><path d="m16 5-4 2 4 2 4-2Z"/><path d="M17 15v4l4-2v-4Z"/><path d="m13 15 4 2 4-2-4-2Z"/></svg>',
+ boxes:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.97 12.92 7 15v4l4 2v-4l-4-2Z"/><path d="m7 15 4-2 4 2-4 2Z"/><path d="M12 7 8 5 4 7l4 2Z"/><path d="m16 5-4 2 4 2 4-2Z"/><path d="M17 15v4l4-2v-4Z"/><path d="m13 15 4 2 4-2Z"/></svg>',
  earth:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10Z"/></svg>',
  volume:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15 9a3 3 0 0 1 0 6M18 7a7 7 0 0 1 0 10"/></svg>',
  terminal:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 17 6-5-6-5M12 19h8"/></svg>',
@@ -74,13 +63,11 @@ const IC={
  ethernet:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="1"/><path d="M6 7v3M10 7v3M14 7v3M18 7v3"/></svg>',
  db:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/></svg>',
  hd:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12H2M5.5 6h13l3 6v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-6ZM6 16h.01M10 16h.01"/></svg>',
- palette:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="1"/><circle cx="17.5" cy="10.5" r="1"/><circle cx="8.5" cy="7.5" r="1"/><circle cx="6.5" cy="12.5" r="1"/><path d="M12 2a10 10 0 0 0 0 20c1 0 1.5-.7 1.5-1.5 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.3 0-.8.7-1.5 1.5-1.5H16a6 6 0 0 0 6-6c0-5-4.5-8.5-10-8.5Z"/></svg>',
- msg:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg>',
+ monitor2:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',
  render:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V5h16v2M9 20h6M12 5v15"/></svg>',
  img:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>',
- type:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>',
  thermo:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0Z"/></svg>',
- wand:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 4 1 2 2 1-2 1-1 2-1-2-2-1 2-1ZM4 20 14 10M9 5l0 0M20 15l0 0"/></svg>',
+ wand:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 4 1 2 2 1-2 1-1 2-1-2-2-1 2-1ZM4 20 14 10"/></svg>',
  msgsq:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2Z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></svg>',
  brain:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5a3 3 0 1 0-5.9.8A3 3 0 0 0 5 12a3 3 0 0 0 1.5 5.6A3 3 0 0 0 12 19Z"/><path d="M12 5a3 3 0 1 1 5.9.8A3 3 0 0 1 19 12a3 3 0 0 1-1.5 5.6A3 3 0 0 1 12 19"/></svg>',
  hash:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></svg>',
@@ -89,57 +76,34 @@ const IC={
  fileT:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5M8 13h8M8 17h6"/></svg>',
  pulse:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
  share:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>',
- check:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 5-5"/></svg>',
+ checkc:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 5-5"/></svg>',
+ check:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>',
  cloudDown:'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 17a5 5 0 0 1-1-9.9A6 6 0 0 1 19 8a4 4 0 0 1 0 9M12 12v9m-3-3 3 3 3-3"/></svg>',
  eye:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>',
- eyeoff:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.2A9 9 0 0 1 12 4c6 0 10 8 10 8a18 18 0 0 1-2.4 3.4M6.6 6.6A18 18 0 0 0 2 12s4 8 10 8a9 9 0 0 0 4.1-1M2 2l20 20M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>',
- fetchM:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.2 9 5.2v5.2l-9 5.2-9-5.2V9.4Z" transform="translate(4.5)"/></svg>',
+ eyeoff:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.2A9 9 0 0 1 12 4c6 0 10 8 10 8a18 18 0 0 1-2.4 3.4M6.6 6.6A18 18 0 0 0 2 12s4 8 10 8a9 9 0 0 0 4.1-1M2 2l20 20"/></svg>',
  sliders:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>',
  camera:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"/><circle cx="12" cy="13" r="3"/></svg>',
  album:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>',
  upload:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>',
- eraser:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16a2 2 0 0 1 0-3l8-8 8 8-8 8"/><path d="m18 7-6 6"/></svg>',
- idea:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M15 14c.2-1 .7-1.7 1.4-2.5A4.6 4.6 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/></svg>'
+ eraser:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16a2 2 0 0 1 0-3l8-8 8 8-8 8"/><path d="m18 7-6 6"/></svg>'
 };
+function applyMode(){const dark=S.settings.mode==='dark'||(S.settings.mode==='system'&&matchMedia('(prefers-color-scheme:dark)').matches);document.documentElement.style.colorScheme=dark?'dark':'light';}
+function updateTopbar(){const c=curConv();$('title-main').textContent=c?c.title:'新对话';$('title-sub').textContent=`${S.model.name} (${S.model.provider})`;}
 
-/* ================= 深浅色 ================= */
-function applyMode(){
- const dark=S.settings.mode==='dark'||(S.settings.mode==='system'&&matchMedia('(prefers-color-scheme:dark)').matches);
- document.documentElement.style.colorScheme=dark?'dark':'light';
- document.documentElement.style.setProperty('--chat-fs',S.settings.chatFontScale||1);
-}
-
-/* ================= 顶栏 ================= */
-function updateTopbar(){
- const c=curConv();
- $('title-main').textContent=c?c.title:'新对话';
- $('title-sub').textContent=`${S.model.name} (${S.model.provider})`;
-}
-
-/* ================= 消息渲染 ================= */
-function renderMessages(){
- const box=$('messages');box.innerHTML='';
- const c=curConv();
- if(!c||!c.msgs.length)return;
- c.msgs.forEach((m,i)=>box.appendChild(m.role==='user'?userRow(m,i):assistantRow(m,i)));
- box.scrollTop=box.scrollHeight;
-}
+function renderMessages(){const box=$('messages');box.innerHTML='';const c=curConv();if(!c||!c.msgs.length)return;c.msgs.forEach((m,i)=>box.appendChild(m.role==='user'?userRow(m,i):assistantRow(m,i)));box.scrollTop=box.scrollHeight;}
 function userRow(m,i){
- const st=S.settings,head=[];
- if(st.showUserName)head.push(`<span class="msg-name">${esc(S.userName)}</span>`);
- if(st.showUserTime&&m.ts)head.push(`<span class="msg-time">${m.ts}</span>`);
- if(st.showUserAvatar)head.push(`<div class="avatar user-avatar">${IC.user}</div>`);
- const row=el('div','msg user',`<div class="msg-head">${head.join('')}</div><div class="user-bubble">${esc(m.text)}</div>`);
- if(st.showUserActions){
-  const acts=el('div','msg-actions');acts.style.justifyContent='flex-end';
-  acts.innerHTML=`<button class="msg-act" data-a="copy">${IC.copy}</button><button class="msg-act" data-a="regen">${IC.regen}</button><button class="msg-act" data-a="edit">${IC.dots}</button>`;
-  bindActs(acts,m,i);row.appendChild(acts);
- }
+ const st=S.settings;const head=el('div','msg-head');const col=el('div','msg-head-col');
+ if(st.showUserName)col.appendChild(el('span','msg-name',esc(S.userName)));
+ if(st.showUserTime&&m.ts)col.appendChild(el('span','msg-time',m.ts));
+ head.appendChild(col);
+ if(st.showUserAvatar)head.appendChild(el('div','avatar user-avatar',IC.user));
+ const row=el('div','msg user');row.appendChild(head);
+ const b=el('div','user-bubble');b.textContent=m.text;row.appendChild(b);
+ if(st.showUserActions){const acts=el('div','msg-actions',`<button class="msg-act" data-a="copy">${IC.copy}</button><button class="msg-act" data-a="regen">${IC.regen}</button><button class="msg-act" data-a="edit">${IC.edit}</button><button class="msg-act" data-a="more">${IC.dots}</button>`);bindActs(acts,m,i);row.appendChild(acts);}
  return row;
 }
 function assistantRow(m,i){
- const st=S.settings;
- const nameTxt=curA().useName?curA().name:S.model.name;
+ const st=S.settings;const nameTxt=curA().useName?curA().name:S.model.name;
  const head=el('div','msg-head');
  if(st.showModelIcon)head.appendChild(el('div','avatar model-avatar',IC.bot));
  const col=el('div','msg-head-col');
@@ -147,548 +111,121 @@ function assistantRow(m,i){
  if(st.showModelTime&&m.ts)col.appendChild(el('span','msg-time',m.ts));
  head.appendChild(col);
  const row=el('div','msg assistant');row.appendChild(head);
- if(m.thinking){
-  const open=!st.autoCollapseThinking;
-  const cot=el('div','cot-card'+(open?' open':''),
-   `<div class="cot-head"><span class="cot-ic">${IC.idea}</span><span class="cot-ttl">深度思考</span>${m.dur?`<span class="cot-dur">(${m.dur}s)</span>`:''}<span class="cot-chev">${IC.chevD}</span></div><div class="cot-body">${esc(m.thinking)}</div>`);
-  cot.querySelector('.cot-head').onclick=()=>cot.classList.toggle('open');
-  row.appendChild(cot);
- }
+ if(m.thinking){const open=!st.autoCollapseThinking;const cot=el('div','cot-card'+(open?' open':''),`<div class="cot-head"><span class="cot-ic">${IC.idea}</span><span class="cot-ttl">深度思考</span>${m.dur?`<span class="cot-dur">(${m.dur}s)</span>`:''}<span class="cot-chev">${IC.chevD}</span></div><div class="cot-body">${esc(m.thinking)}</div>`);cot.querySelector('.cot-head').onclick=()=>cot.classList.toggle('open');row.appendChild(cot);}
  const body=el('div','assistant-body'+(st.bubbleStyle!=='default'?' '+st.bubbleStyle:''));
  if(m.loading)body.innerHTML='<div class="loading-dots"><span></span><span></span><span></span></div>';
- else body.innerHTML=`<p>${esc(m.text)}</p>`;
+ else{const p=el('p');p.textContent=m.text;body.appendChild(p);}
  row.appendChild(body);
- if(!m.loading){
-  const acts=el('div','msg-actions',
-   `<button class="msg-act" data-a="copy">${IC.copy}</button><button class="msg-act" data-a="regen">${IC.regen}</button><button class="msg-act" data-a="tts">${IC.tts}</button><button class="msg-act" data-a="trans">${IC.trans}</button><button class="msg-act" data-a="more">${IC.dots}</button>`+
-   (st.showTokenStats?`<span class="tok-stat">${(m.text||'').length} tok</span>`:''));
-  bindActs(acts,m,i);row.appendChild(acts);
- }
+ if(!m.loading){const acts=el('div','msg-actions',`<button class="msg-act" data-a="copy">${IC.copy}</button><button class="msg-act" data-a="regen">${IC.regen}</button><button class="msg-act" data-a="tts">${IC.tts}</button><button class="msg-act" data-a="trans">${IC.trans}</button><button class="msg-act" data-a="more">${IC.dots}</button>`+(st.showTokenStats?`<span class="tok-stat">${(m.text||'').length} tokens</span>`:''));bindActs(acts,m,i);row.appendChild(acts);}
  return row;
 }
-function bindActs(acts,m,i){
- acts.querySelectorAll('.msg-act').forEach(b=>b.onclick=()=>{
-  const a=b.dataset.a;
-  if(a==='copy'){navigator.clipboard&&navigator.clipboard.writeText(m.text);b.classList.add('copied');setTimeout(()=>b.classList.remove('copied'),1000);toast('已复制');}
-  else if(a==='regen'){regen(i);}
-  else if(a==='tts')toast('朗读（需配置语音服务）');
-  else if(a==='trans')toast('翻译（需配置服务）');
-  else if(a==='edit'){const v=prompt('编辑消息',m.text);if(v!=null){m.text=v;save();renderMessages();}}
-  else moreSheet(m,i);
- });
-}
-function moreSheet(m,i){
- sheet('更多',sh=>{
-  sh.appendChild(sheetItem('复制',{icon:IC.copy,onClick:()=>{navigator.clipboard&&navigator.clipboard.writeText(m.text);closeSheet();toast('已复制');}}));
-  sh.appendChild(sheetItem('删除此消息',{icon:IC.trash,danger:true,onClick:()=>{const c=curConv();c.msgs.splice(i,1);save();renderMessages();closeSheet();}}));
- });
-}
-function regen(i){
- const c=curConv();if(!c)return;
- if(S.settings.regenDeleteAfter)c.msgs=c.msgs.slice(0,i);
- const a={role:'assistant',text:'',loading:true,ts:stamp()};c.msgs.push(a);save();renderMessages();
- fakeReply(a);
-}
-
-/* ================= 发送 ================= */
-function fakeReply(a){
- setTimeout(()=>{
-  a.loading=false;
-  if(S.settings.reason||curA().thinkingBudget>0){a.thinking='根据助手设定和上下文，我在组织一段合理的回复……（这里是思考过程占位）';a.dur=(1+Math.random()*2).toFixed(1);}
-  a.text='（这里将接入模型回复）'+(S.settings.search?' [已联网]':'');
-  save();renderMessages();
- },900);
-}
-function send(){
- const t=$('input-field').value.trim();if(!t)return;
- let c=curConv();if(!c){c={id:uid(),title:'新对话',msgs:[],ts:Date.now()};S.convs.unshift(c);S.cur=c.id;}
- c.msgs.push({role:'user',text:t,ts:stamp()});
- if(c.title==='新对话')c.title=t.slice(0,20);
- $('input-field').value='';autoGrow();refreshSend();
- const a={role:'assistant',text:'',loading:true,ts:stamp()};c.msgs.push(a);
- save();renderMessages();updateTopbar();renderDrawer();fakeReply(a);
-}
+function bindActs(acts,m,i){acts.querySelectorAll('.msg-act').forEach(b=>b.onclick=()=>{const a=b.dataset.a;
+ if(a==='copy'){navigator.clipboard&&navigator.clipboard.writeText(m.text);b.classList.add('copied');setTimeout(()=>b.classList.remove('copied'),1000);toast('已复制');}
+ else if(a==='regen')regen(i);
+ else if(a==='tts')toast('朗读（需配置语音服务）');
+ else if(a==='trans')toast('翻译（需配置服务）');
+ else if(a==='edit'){const v=prompt('编辑消息',m.text);if(v!=null){m.text=v;save();renderMessages();}}
+ else moreSheet(m,i);});}
+function moreSheet(m,i){sheet('更多',sh=>{sh.appendChild(sheetItem('复制',{icon:IC.copy,onClick:()=>{navigator.clipboard&&navigator.clipboard.writeText(m.text);closeSheet();toast('已复制');}}));sh.appendChild(sheetItem('删除此消息',{icon:IC.trash,danger:true,onClick:()=>{const c=curConv();c.msgs.splice(i,1);save();renderMessages();closeSheet();}}));});}
+function regen(i){const c=curConv();if(!c)return;if(S.settings.regenDeleteAfter)c.msgs=c.msgs.slice(0,i);const a={role:'assistant',text:'',loading:true,ts:stamp()};c.msgs.push(a);save();renderMessages();fakeReply(a);}
+function fakeReply(a){setTimeout(()=>{a.loading=false;if(S.settings.reason||curA().thinkingBudget>0){a.thinking='根据助手设定和上下文，我在组织一段合理的回复……（这里是思考过程占位）';a.dur=(1+Math.random()*2).toFixed(1);}a.text='（这里将接入模型回复）'+(S.settings.search?' [已联网]':'');save();renderMessages();},900);}
+function send(){const t=$('input-field').value.trim();if(!t)return;let c=curConv();if(!c){c={id:uid(),title:'新对话',msgs:[],ts:Date.now()};S.convs.unshift(c);S.cur=c.id;}c.msgs.push({role:'user',text:t,ts:stamp()});if(c.title==='新对话')c.title=t.slice(0,20);$('input-field').value='';autoGrow();refreshSend();const a={role:'assistant',text:'',loading:true,ts:stamp()};c.msgs.push(a);save();renderMessages();updateTopbar();renderDrawer();fakeReply(a);}
 function autoGrow(){const f=$('input-field');f.style.height='auto';f.style.height=Math.min(f.scrollHeight,130)+'px';}
 function refreshSend(){$('btn-send').disabled=$('input-field').value.trim().length===0;}
-
-/* ================= 侧边栏 ================= */
 function openDrawer(){$('drawer').classList.add('open');$('scrim').hidden=false;renderDrawer();}
 function closeDrawer(){$('drawer').classList.remove('open');$('scrim').hidden=true;}
-function renderDrawer(){
- $('drawer-assistant-name').textContent=curA().name;
- $('drawer-assistant-avatar').textContent=initial(curA().name);
- $('user-name').textContent=S.userName;$('user-avatar').textContent=initial(S.userName);
- const list=$('drawer-list');list.innerHTML='';
- const q=($('drawer-search-input').value||'').trim();
- let convs=S.convs.slice();
- if(q)convs=convs.filter(c=>c.title.includes(q));
+function renderDrawer(){$('drawer-assistant-name').textContent=curA().name;$('drawer-assistant-avatar').textContent=initial(curA().name);$('user-name').textContent=S.userName;$('user-avatar').textContent=initial(S.userName);
+ const list=$('drawer-list');list.innerHTML='';const q=($('drawer-search-input').value||'').trim();let convs=S.convs.slice();if(q)convs=convs.filter(c=>c.title.includes(q));
  if(!convs.length){list.appendChild(el('div','grp-label',q?'无匹配':'暂无对话'));return;}
- const today=new Date().toDateString();
- const g={今天:[],更早:[]};
- convs.forEach(c=>{(new Date(c.ts).toDateString()===today?g['今天']:g['更早']).push(c);});
- ['今天','更早'].forEach(k=>{
-  if(!g[k].length)return;
-  list.appendChild(el('div','grp-label',k));
-  g[k].forEach(c=>{
-   const tile=el('div','chat-tile'+(c.id===S.cur?' active':''),`<span class="t">${esc(c.title)}</span><button class="del">${IC.trash}</button>`);
-   tile.onclick=e=>{if(!e.target.closest('.del')){S.cur=c.id;save();renderMessages();updateTopbar();closeDrawer();}};
-   tile.querySelector('.del').onclick=e=>{e.stopPropagation();if(confirm('删除对话？')){S.convs=S.convs.filter(x=>x.id!==c.id);if(S.cur===c.id)S.cur=S.convs[0]?S.convs[0].id:null;save();renderDrawer();renderMessages();updateTopbar();}};
-   list.appendChild(tile);
-  });
- });
-}
-
-/* ================= 弹窗框架 ================= */
-function sheet(title,build){
- const host=$('sheet-host');host.hidden=false;host.innerHTML='';
- const scr=el('div','sheet-scrim');const sh=el('div','sheet',`<div class="sheet-grip"></div>${title?`<div class="sheet-title">${esc(title)}</div>`:''}`);
- host.appendChild(scr);host.appendChild(sh);scr.onclick=closeSheet;build(sh);
-}
+ const today=new Date().toDateString();const g={今天:[],更早:[]};convs.forEach(c=>{(new Date(c.ts).toDateString()===today?g['今天']:g['更早']).push(c);});
+ ['今天','更早'].forEach(k=>{if(!g[k].length)return;list.appendChild(el('div','grp-label',k));g[k].forEach(c=>{const tile=el('div','chat-tile'+(c.id===S.cur?' active':''),`<span class="t">${esc(c.title)}</span><button class="del">${IC.trash}</button>`);tile.onclick=e=>{if(!e.target.closest('.del')){S.cur=c.id;save();renderMessages();updateTopbar();closeDrawer();}};tile.querySelector('.del').onclick=e=>{e.stopPropagation();if(confirm('删除对话？')){S.convs=S.convs.filter(x=>x.id!==c.id);if(S.cur===c.id)S.cur=S.convs[0]?S.convs[0].id:null;save();renderDrawer();renderMessages();updateTopbar();}};list.appendChild(tile);});});}
+function sheet(title,build){const host=$('sheet-host');host.hidden=false;host.innerHTML='';const scr=el('div','sheet-scrim');const sh=el('div','sheet',`<div class="sheet-grip"></div>${title?`<div class="sheet-title">${esc(title)}</div>`:''}`);host.appendChild(scr);host.appendChild(sh);scr.onclick=closeSheet;build(sh);}
 function closeSheet(){$('sheet-host').hidden=true;$('sheet-host').innerHTML='';}
-function sheetItem(label,o){o=o||{};
- const it=el('div','sheet-item'+(o.danger?' danger':''),
-  `${o.icon?`<span class="si-ic">${o.icon}</span>`:''}<div class="col">${esc(label)}${o.sub?`<div class="s">${esc(o.sub)}</div>`:''}</div>${o.checked?`<span class="ck">${IC.check}</span>`:''}`);
- if(o.onClick)it.onclick=o.onClick;return it;}
-
-/* ================= 页面框架 ================= */
+function sheetItem(label,o){o=o||{};const it=el('div','sheet-item'+(o.danger?' danger':''),`${o.icon?`<span class="si-ic">${o.icon}</span>`:''}<div class="col">${esc(label)}${o.sub?`<div class="s">${esc(o.sub)}</div>`:''}</div>${o.checked?`<span class="ck">${IC.checkc}</span>`:''}`);if(o.onClick)it.onclick=o.onClick;return it;}
 function openScreen(node){$('screen-host').appendChild(node);requestAnimationFrame(()=>node.classList.add('open'));}
 function closeScreen(node){node.classList.remove('open');setTimeout(()=>node.remove(),280);}
-function screen(title,opts){opts=opts||{};
- const sc=el('div','screen');
- const bar=el('div','screen-bar',`<button class="appbar-btn back">${IC.back}</button>${opts.avatar?`<span class="s-av">${esc(opts.avatar)}</span>`:''}<span class="ttl">${esc(title)}</span>`);
- (opts.actions||[]).forEach(a=>{const b=el('button','sb-act'+(a.danger?' danger':''),a.icon);b.onclick=a.onClick;bar.appendChild(b);});
- sc.appendChild(bar);const body=el('div','screen-body');sc.appendChild(body);
- bar.querySelector('.back').onclick=()=>closeScreen(sc);sc._body=body;return sc;
-}
-function navRow(icon,label,val,onClick){
- const r=el('div','nav-row',`<span class="ic">${icon}</span><span class="lbl">${esc(label)}</span>${val!=null?`<span class="val">${esc(val)}</span>`:''}<span class="chev">${IC.chev}</span>`);
- if(onClick)r.onclick=onClick;return r;}
-function swRow(icon,label,sub,get,set){
- const r=el('div','sw-row',`<span class="ic">${icon}</span><div class="txt"><div class="l">${esc(label)}</div>${sub?`<div class="s">${esc(sub)}</div>`:''}</div>`);
- const sw=el('button','ios-sw'+(get()?' on':''));
- sw.onclick=()=>{const v=!get();set(v);sw.classList.toggle('on',v);save();};r.appendChild(sw);return r;}
-function sliderRow(label,min,max,step,get,set,fmt){
- const r=el('div','slider-row',`<div class="top"><span class="l">${esc(label)}</span><span class="v">${fmt?fmt(get()):get()}</span></div>`);
- const inp=el('input');inp.type='range';inp.min=min;inp.max=max;inp.step=step;inp.value=get();
- inp.oninput=()=>{set(parseFloat(inp.value));r.querySelector('.v').textContent=fmt?fmt(get()):get();};
- inp.onchange=save;r.appendChild(inp);return r;}
+function screen(title,opts){opts=opts||{};const sc=el('div','screen');const bar=el('div','screen-bar',`<button class="appbar-btn back">${IC.back}</button>${opts.avatar?`<span class="s-av">${esc(opts.avatar)}</span>`:''}<span class="ttl">${esc(title)}</span>`);(opts.actions||[]).forEach(a=>{const b=el('button','sb-act'+(a.danger?' danger':''),a.icon);b.onclick=a.onClick;bar.appendChild(b);});sc.appendChild(bar);const body=el('div','screen-body');sc.appendChild(body);bar.querySelector('.back').onclick=()=>closeScreen(sc);sc._body=body;return sc;}
+function navRow(icon,label,val,onClick){const r=el('div','nav-row',`<span class="ic">${icon||''}</span><span class="lbl">${esc(label)}</span>${val!=null?`<span class="val">${esc(val)}</span>`:''}<span class="chev">${IC.chev}</span>`);if(onClick)r.onclick=onClick;return r;}
+function swRow(icon,label,sub,get,set){const r=el('div','sw-row',`<span class="ic">${icon||''}</span><div class="txt"><div class="l">${esc(label)}</div>${sub?`<div class="s">${esc(sub)}</div>`:''}</div>`);const sw=el('button','ios-sw'+(get()?' on':''));sw.onclick=()=>{const v=!get();set(v);sw.classList.toggle('on',v);save();};r.appendChild(sw);return r;}
+function sliderRow(label,min,max,step,get,set,fmt){const r=el('div','slider-row',`<div class="top"><span class="l">${esc(label)}</span><span class="v">${fmt?fmt(get()):get()}</span></div>`);const inp=el('input');inp.type='range';inp.min=min;inp.max=max;inp.step=step;inp.value=get();inp.oninput=()=>{set(parseFloat(inp.value));r.querySelector('.v').textContent=fmt?fmt(get()):get();};inp.onchange=save;r.appendChild(inp);return r;}
 function card(rows){const c=el('div','sec-card');rows.forEach((ch,i)=>{if(i)c.appendChild(el('div','row-div'));c.appendChild(ch);});return c;}
-
-/* ================= 设置页 ================= */
-function settingsScreen(){
- const sc=screen('设置');const b=sc._body;
+function settingsScreen(){const sc=screen('设置');const b=sc._body;
  b.appendChild(el('div','sec-header','通用设置'));
- b.appendChild(card([
-  navRow(IC.sunmoon,'颜色模式',{system:'跟随系统',light:'浅色',dark:'深色'}[S.settings.mode],()=>modeSheet(sc)),
-  navRow(IC.monitor,'偏好设置',null,()=>openScreen(displayScreen())),
-  navRow(IC.bot,'助手',null,()=>openScreen(assistantListScreen()))
- ]));
+ b.appendChild(card([navRow(IC.sunmoon,'颜色模式',{system:'跟随系统',light:'浅色',dark:'深色'}[S.settings.mode],()=>modeSheet(sc)),navRow(IC.monitor,'偏好设置',null,()=>openScreen(displayScreen())),navRow(IC.bot,'助手',null,()=>openScreen(assistantListScreen()))]));
  b.appendChild(el('div','sec-header','模型与服务'));
- b.appendChild(card([
-  navRow(IC.heart,'默认模型',S.model.name,()=>modelSelector(m=>{S.model=m;save();updateTopbar();closeScreen(sc);openScreen(settingsScreen());})),
-  navRow(IC.boxes,'供应商',null,()=>openScreen(providersScreen())),
-  navRow(IC.earth,'搜索服务',null,()=>toast('搜索服务')),
-  navRow(IC.volume,'语音服务',null,()=>toast('语音服务')),
-  navRow(IC.terminal,'MCP',null,()=>toast('MCP')),
-  navRow(IC.book,'世界书',null,()=>toast('世界书')),
-  navRow(IC.zap,'快捷短语',null,()=>toast('快捷短语')),
-  navRow(IC.layers,'指令注入',null,()=>toast('指令注入')),
-  navRow(IC.ethernet,'网络代理',null,()=>toast('网络代理'))
- ]));
- b.appendChild(el('div','sec-header','数据设置'));
- let files=0;S.convs.forEach(c=>files+=c.msgs.length);
- b.appendChild(card([
-  navRow(IC.db,'数据备份',null,()=>toast('数据备份')),
-  navRow(IC.hd,'聊天记录存储',`共 ${files} 条`,()=>{if(confirm('清空全部数据恢复默认？')){localStorage.removeItem('kelivo');location.reload();}}),
-  navRow(IC.user,'用户名',S.userName,()=>{const v=prompt('用户名',S.userName);if(v){S.userName=v.slice(0,24);save();renderDrawer();closeScreen(sc);openScreen(settingsScreen());}})
- ]));
- return sc;
-}
-function modeSheet(sc){
- sheet('颜色模式',sh=>{[['system','跟随系统',IC.monitor],['light','浅色',IC.sunmoon],['dark','深色',IC.sunmoon]].forEach(([k,n,ic])=>{
-  sh.appendChild(sheetItem(n,{icon:ic,checked:S.settings.mode===k,onClick:()=>{S.settings.mode=k;save();applyMode();closeSheet();closeScreen(sc);openScreen(settingsScreen());}}));});});
-}
-
-/* ================= 偏好/显示设置 ================= */
-function displayScreen(){
- const sc=screen('偏好设置');const b=sc._body;const st=S.settings;
+ b.appendChild(card([navRow(IC.heart,'默认模型',S.model.name,()=>modelSelector(m=>{S.model=m;save();updateTopbar();closeScreen(sc);openScreen(settingsScreen());})),navRow(IC.boxes,'供应商',null,()=>openScreen(providersScreen())),navRow(IC.earth,'搜索服务',null,()=>toast('搜索服务')),navRow(IC.volume,'语音服务',null,()=>toast('语音服务')),navRow(IC.terminal,'MCP',null,()=>toast('MCP')),navRow(IC.book,'世界书',null,()=>toast('世界书')),navRow(IC.zap,'快捷短语',null,()=>toast('快捷短语')),navRow(IC.layers,'指令注入',null,()=>toast('指令注入')),navRow(IC.ethernet,'网络代理',null,()=>toast('网络代理'))]));
+ b.appendChild(el('div','sec-header','数据设置'));let files=0;S.convs.forEach(c=>files+=c.msgs.length);
+ b.appendChild(card([navRow(IC.db,'数据备份',null,()=>toast('数据备份')),navRow(IC.hd,'聊天记录存储',`共 ${files} 条`,()=>{if(confirm('清空全部数据恢复默认？')){localStorage.removeItem('kelivo');location.reload();}}),navRow(IC.user,'用户名',S.userName,()=>{const v=prompt('用户名',S.userName);if(v){S.userName=v.slice(0,24);save();renderDrawer();closeScreen(sc);openScreen(settingsScreen());}})]));
+ return sc;}
+function modeSheet(sc){sheet('颜色模式',sh=>{[['system','跟随系统',IC.monitor],['light','浅色',IC.sunmoon],['dark','深色',IC.sunmoon]].forEach(([k,n,ic])=>{sh.appendChild(sheetItem(n,{icon:ic,checked:S.settings.mode===k,onClick:()=>{S.settings.mode=k;save();applyMode();closeSheet();closeScreen(sc);openScreen(settingsScreen());}}));});});}
+function displayScreen(){const sc=screen('偏好设置');const b=sc._body;const st=S.settings;
  b.appendChild(el('div','sec-header','聊天条目显示'));
- b.appendChild(card([
-  swRow(IC.user,'显示用户头像',null,()=>st.showUserAvatar,v=>{st.showUserAvatar=v;renderMessages();}),
-  swRow(IC.caseS,'显示用户名',null,()=>st.showUserName,v=>{st.showUserName=v;renderMessages();}),
-  swRow(IC.fileT,'显示用户时间戳',null,()=>st.showUserTime,v=>{st.showUserTime=v;renderMessages();}),
-  swRow(IC.dots,'显示用户消息操作',null,()=>st.showUserActions,v=>{st.showUserActions=v;renderMessages();}),
-  swRow(IC.bot,'显示模型图标',null,()=>st.showModelIcon,v=>{st.showModelIcon=v;renderMessages();}),
-  swRow(IC.caseS,'显示模型名',null,()=>st.showModelName,v=>{st.showModelName=v;renderMessages();}),
-  swRow(IC.fileT,'显示模型时间戳',null,()=>st.showModelTime,v=>{st.showModelTime=v;renderMessages();}),
-  swRow(IC.boxes,'显示供应商名',null,()=>st.showProviderName,v=>{st.showProviderName=v;renderMessages();}),
-  swRow(IC.hash,'显示Token统计',null,()=>st.showTokenStats,v=>{st.showTokenStats=v;renderMessages();})
- ]));
+ b.appendChild(card([swRow(IC.user,'显示用户头像',null,()=>st.showUserAvatar,v=>{st.showUserAvatar=v;renderMessages();}),swRow(IC.caseS,'显示用户名',null,()=>st.showUserName,v=>{st.showUserName=v;renderMessages();}),swRow(IC.fileT,'显示用户时间戳',null,()=>st.showUserTime,v=>{st.showUserTime=v;renderMessages();}),swRow(IC.dots,'显示用户消息操作',null,()=>st.showUserActions,v=>{st.showUserActions=v;renderMessages();}),swRow(IC.bot,'显示模型图标',null,()=>st.showModelIcon,v=>{st.showModelIcon=v;renderMessages();}),swRow(IC.caseS,'显示模型名',null,()=>st.showModelName,v=>{st.showModelName=v;renderMessages();}),swRow(IC.fileT,'显示模型时间戳',null,()=>st.showModelTime,v=>{st.showModelTime=v;renderMessages();}),swRow(IC.boxes,'显示供应商名',null,()=>st.showProviderName,v=>{st.showProviderName=v;renderMessages();}),swRow(IC.hash,'显示Token统计',null,()=>st.showTokenStats,v=>{st.showTokenStats=v;renderMessages();})]));
  b.appendChild(el('div','sec-header','渲染'));
- b.appendChild(card([
-  swRow(IC.render,'LaTeX / 数学渲染',null,()=>st.latex,v=>st.latex=v),
-  swRow(IC.render,'用户消息 Markdown',null,()=>st.userMarkdown,v=>st.userMarkdown=v),
-  swRow(IC.render,'助手消息 Markdown',null,()=>st.assistantMarkdown,v=>st.assistantMarkdown=v)
- ]));
+ b.appendChild(card([swRow(IC.render,'LaTeX / 数学渲染',null,()=>st.latex,v=>st.latex=v),swRow(IC.render,'用户消息 Markdown',null,()=>st.userMarkdown,v=>st.userMarkdown=v),swRow(IC.render,'助手消息 Markdown',null,()=>st.assistantMarkdown,v=>st.assistantMarkdown=v)]));
  b.appendChild(el('div','sec-header','行为与启动'));
- b.appendChild(card([
-  swRow(IC.brain,'自动折叠思考',null,()=>st.autoCollapseThinking,v=>{st.autoCollapseThinking=v;renderMessages();}),
-  swRow(IC.brain,'折叠思考步骤',null,()=>st.collapseThinkingSteps,v=>st.collapseThinkingSteps=v),
-  swRow(IC.terminal,'工具结果摘要',null,()=>st.toolResultSummary,v=>st.toolResultSummary=v),
-  swRow(IC.regen,'重新生成删除后续',null,()=>st.regenDeleteAfter,v=>st.regenDeleteAfter=v),
-  swRow(IC.msg,'回车发送','桌面端 Enter 发送',()=>st.enterToSend,v=>st.enterToSend=v)
- ]));
+ b.appendChild(card([swRow(IC.brain,'自动折叠思考',null,()=>st.autoCollapseThinking,v=>{st.autoCollapseThinking=v;renderMessages();}),swRow(IC.brain,'折叠思考步骤',null,()=>st.collapseThinkingSteps,v=>st.collapseThinkingSteps=v),swRow(IC.terminal,'工具结果摘要',null,()=>st.toolResultSummary,v=>st.toolResultSummary=v),swRow(IC.regen,'重新生成删除后续',null,()=>st.regenDeleteAfter,v=>st.regenDeleteAfter=v),swRow(IC.msgsq,'回车发送','桌面端 Enter 发送',()=>st.enterToSend,v=>st.enterToSend=v)]));
  b.appendChild(el('div','sec-header','消息背景样式'));
- b.appendChild(card([
-  navRow(IC.msgsq,'气泡样式',{default:'默认(无背景)',frosted:'磨砂',solid:'实色'}[st.bubbleStyle],()=>{
-   sheet('消息背景样式',sh=>{[['default','默认(无背景)'],['frosted','磨砂'],['solid','实色']].forEach(([k,n])=>{
-    sh.appendChild(sheetItem(n,{checked:st.bubbleStyle===k,onClick:()=>{st.bubbleStyle=k;save();renderMessages();closeSheet();closeScreen(sc);openScreen(displayScreen());}}));});});
-  })
- ]));
+ b.appendChild(card([navRow(IC.msgsq,'气泡样式',{default:'默认(无背景)',frosted:'磨砂',solid:'实色'}[st.bubbleStyle],()=>{sheet('消息背景样式',sh=>{[['default','默认(无背景)'],['frosted','磨砂'],['solid','实色']].forEach(([k,n])=>{sh.appendChild(sheetItem(n,{checked:st.bubbleStyle===k,onClick:()=>{st.bubbleStyle=k;save();renderMessages();closeSheet();closeScreen(sc);openScreen(displayScreen());}}));});});})]));
  b.appendChild(el('div','sec-header','字体与滚动'));
- b.appendChild(card([
-  sliderRow('聊天字号',0.5,1.5,0.05,()=>st.chatFontScale,v=>{st.chatFontScale=v;applyMode();},v=>Math.round(v*100)+'%'),
-  sliderRow('自动滚动空闲(s)',2,64,2,()=>st.autoScrollIdle,v=>st.autoScrollIdle=v,v=>v+'s')
- ]));
- return sc;
-}
-
-/* ================= 助手列表 ================= */
-function assistantListScreen(){
- const sc=screen('助手',{actions:[{icon:IC.plus,onClick:()=>{const a={id:uid(),name:'新助手',prompt:'',temperature:0.6,topP:null,contextMessages:64,thinkingBudget:0,maxTokens:null,useAvatar:false,useName:false,streaming:true,memory:[],phrases:[],chatModel:null,background:null};S.assistants.push(a);save();openScreen(assistantEditScreen(a));refresh();}}]});
- const b=sc._body;
- function refresh(){
-  const old=b.querySelectorAll('.list-card');old.forEach(x=>x.remove());
-  S.assistants.forEach(a=>{
-   const c=el('div','list-card',`<div class="av">${esc(initial(a.name))}</div><div class="col"><div class="nm">${esc(a.name)}</div><div class="sub">${esc(a.prompt||'（无提示词）')}</div></div>`+(S.assistants.length>1?`<button class="del">${IC.trash}</button>`:''));
-   c.onclick=e=>{if(!e.target.closest('.del'))openScreen(assistantEditScreen(a));};
-   const d=c.querySelector('.del');if(d)d.onclick=e=>{e.stopPropagation();if(confirm('删除助手？')){S.assistants=S.assistants.filter(x=>x.id!==a.id);if(S.curA===a.id)S.curA=S.assistants[0].id;save();refresh();renderDrawer();}};
-   b.appendChild(c);
-  });
- }
- refresh();return sc;
-}
-
-/* ================= 助手编辑（4 Tab）================= */
-function assistantEditScreen(a){
- const sc=screen(a.name,{avatar:initial(a.name),actions:[{icon:IC.sliders,onClick:()=>toast('大纲/布局')}]});
- const b=sc._body;
- const tabbar=el('div','bottom-tabs');tabbar.style.position='static';tabbar.style.marginBottom='12px';
- const tabs=[['基础设置',IC.settings2],['提示词',IC.fileT],['记忆',IC.brain],['快捷短语',IC.zap]];
- const pane=el('div');
- let cur=0;
+ b.appendChild(card([sliderRow('聊天字号',0.5,1.5,0.05,()=>st.chatFontScale,v=>st.chatFontScale=v,v=>Math.round(v*100)+'%'),sliderRow('自动滚动空闲(s)',2,64,2,()=>st.autoScrollIdle,v=>st.autoScrollIdle=v,v=>v+'s')]));
+ return sc;}
+function assistantListScreen(){const sc=screen('助手',{actions:[{icon:IC.plus,onClick:()=>{const a={id:uid(),name:'新助手',prompt:'',temperature:0.6,topP:null,contextMessages:64,thinkingBudget:0,maxTokens:null,useAvatar:false,useName:false,streaming:true,memory:[],phrases:[],chatModel:null,background:null};S.assistants.push(a);save();openScreen(assistantEditScreen(a));refresh();}}]});const b=sc._body;
+ function refresh(){b.querySelectorAll('.list-card').forEach(x=>x.remove());S.assistants.forEach(a=>{const c=el('div','list-card',`<div class="av">${esc(initial(a.name))}</div><div class="col"><div class="nm">${esc(a.name)}</div><div class="sub">${esc(a.prompt||'（无提示词）')}</div></div>`+(S.assistants.length>1?`<button class="del">${IC.trash}</button>`:''));c.onclick=e=>{if(!e.target.closest('.del'))openScreen(assistantEditScreen(a));};const d=c.querySelector('.del');if(d)d.onclick=e=>{e.stopPropagation();if(confirm('删除助手？')){S.assistants=S.assistants.filter(x=>x.id!==a.id);if(S.curA===a.id)S.curA=S.assistants[0].id;save();refresh();renderDrawer();}};b.appendChild(c);});}
+ refresh();return sc;}
+function assistantEditScreen(a){const sc=screen(a.name,{avatar:initial(a.name),actions:[{icon:IC.sliders,onClick:()=>toast('大纲/布局')}]});const b=sc._body;const tabbar=el('div','bottom-tabs');tabbar.style.position='static';tabbar.style.marginBottom='12px';const tabs=[['基础设置',IC.settings2],['提示词',IC.fileT],['记忆',IC.brain],['快捷短语',IC.zap]];const pane=el('div');let cur=0;
  function drawTabs(){tabbar.innerHTML='';tabs.forEach((t,i)=>{const it=el('button','bt-item'+(i===cur?' active':''),`<span>${t[1]}</span><span>${t[0]}</span>`);it.onclick=()=>{cur=i;drawTabs();drawPane();};tabbar.appendChild(it);});}
- function drawPane(){pane.innerHTML='';
-  if(cur===0)basicTab(pane,a,sc);
-  else if(cur===1)promptTab(pane,a);
-  else if(cur===2)memoryTab(pane,a);
-  else phrasesTab(pane,a);
- }
- b.appendChild(tabbar);b.appendChild(pane);drawTabs();drawPane();return sc;
-}
-function basicTab(pane,a,sc){
- const idc=el('div','big-card');
- const wrap=el('div','id-card',`<div class="big-av">${esc(initial(a.name))}</div>`);
- const col=el('div','id-col',`<div class="field-lbl" style="margin-top:0">助手名称</div>`);
- const nm=el('input','field-in');nm.value=a.name;nm.oninput=()=>{a.name=nm.value;save();renderDrawer();};
- col.appendChild(nm);wrap.appendChild(col);idc.appendChild(wrap);pane.appendChild(idc);
- pane.appendChild(card([
-  navRow(IC.thermo,'Temperature',a.temperature==null?'已关闭':a.temperature.toFixed(2),()=>paramSheet(a,'temperature','Temperature',0,2,0.05,0.6,sc)),
-  navRow(IC.wand,'Top P',a.topP==null?'已关闭（使用服务商默认）':a.topP.toFixed(2),()=>paramSheet(a,'topP','Top P',0,1,0.05,1,sc)),
-  navRow(IC.msgsq,'上下文消息数量',String(a.contextMessages),()=>paramSheet(a,'contextMessages','上下文消息数量',1,256,1,64,sc,true)),
-  navRow(IC.brain,'思考预算',String(a.thinkingBudget||0),()=>paramSheet(a,'thinkingBudget','思考预算',0,32768,256,0,sc,true)),
-  navRow(IC.hash,'最大 Token 数',a.maxTokens==null?'无限制':String(a.maxTokens),()=>paramSheet(a,'maxTokens','最大 Token 数',0,32768,256,null,sc,true)),
-  swRow(IC.user,'使用助手头像',null,()=>a.useAvatar,v=>{a.useAvatar=v;renderMessages();}),
-  swRow(IC.caseS,'使用助手名字',null,()=>a.useName,v=>{a.useName=v;renderMessages();}),
-  swRow(IC.zap,'流式输出',null,()=>a.streaming,v=>a.streaming=v)
- ]));
- // 聊天模型卡
- const mc=el('div','big-card');
- mc.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span>${IC.msg}</span><b style="font-size:17px">聊天模型</b></div><div style="font-size:13px;color:color-mix(in srgb,var(--on-surface) 55%,transparent);margin-bottom:12px">为该助手设置默认聊天模型（未设置时使用全局默认）</div>`;
- const row=el('div','model-row');row.style.cursor='pointer';
- row.innerHTML=`<div class="mav">${IC.bot}</div><div class="mcol"><div class="mnm">${esc(a.chatModel?a.chatModel.name:S.model.name)}</div></div>`;
- row.onclick=()=>modelSelector(m=>{a.chatModel=m;save();closeScreen(sc);openScreen(assistantEditScreen(a));});
- mc.appendChild(row);pane.appendChild(mc);
- // 聊天背景
- const bg=el('div','big-card');
- bg.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span>${IC.img}</span><b style="font-size:17px">聊天背景</b></div>`;
- const bgbtn=el('button','btn ghost full',a.background?'更换背景图':'选择背景图');
- bgbtn.onclick=()=>{const inp=el('input');inp.type='file';inp.accept='image/*';inp.onchange=()=>{const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{a.background=r.result;save();toast('背景已设置');};r.readAsDataURL(f);};inp.click();};
- bg.appendChild(bgbtn);
- if(a.background){const rm=el('button','btn danger full','移除背景');rm.style.marginTop='10px';rm.onclick=()=>{a.background=null;save();closeScreen(sc);openScreen(assistantEditScreen(a));};bg.appendChild(rm);}
- pane.appendChild(bg);
-}
-function paramSheet(a,key,label,min,max,step,def,sc,int){
- sheet(label,sh=>{
-  const on=a[key]!=null;
-  const swWrap=el('div','sw-row');swWrap.style.padding='0 0 8px';
-  swWrap.innerHTML=`<div class="txt"><div class="l">启用</div></div>`;
-  const sw=el('button','ios-sw'+(on?' on':''));
-  const box=el('div');
-  function draw(){box.innerHTML='';if(a[key]==null)return;
-   box.appendChild(sliderRow(label,min,max,step,()=>a[key],v=>{a[key]=int?Math.round(v):v;save();},v=>int?String(Math.round(v)):(+v).toFixed(2)));}
-  sw.onclick=()=>{if(a[key]==null){a[key]=def==null?min:def;}else a[key]=null;sw.classList.toggle('on',a[key]!=null);save();draw();};
-  swWrap.appendChild(sw);sh.appendChild(swWrap);sh.appendChild(box);draw();
-  const done=el('button','btn primary full','完成');done.style.marginTop='14px';
-  done.onclick=()=>{closeSheet();closeScreen(sc);openScreen(assistantEditScreen(a));};sh.appendChild(done);
- });
-}
-function promptTab(pane,a){
- pane.appendChild(el('div','field-lbl','系统提示词'));
- const ta=el('textarea','field-in');ta.value=a.prompt;ta.style.minHeight='240px';ta.oninput=()=>{a.prompt=ta.value;save();};
- pane.appendChild(ta);
-}
-function memoryTab(pane,a){
- const add=el('button','btn primary full','添加记忆');add.style.margin='6px 0 12px';
- add.onclick=()=>{const v=prompt('记忆内容');if(v){a.memory.push({id:uid(),text:v});save();memoryTab(pane,a);}};
- pane.innerHTML='';pane.appendChild(add);
- if(!a.memory.length){pane.appendChild(el('div','field-lbl','暂无记忆'));return;}
- a.memory.forEach(m=>{const c=el('div','list-card',`<div class="col"><div class="sub" style="font-size:15px;color:var(--on-surface);white-space:normal">${esc(m.text)}</div></div><button class="del">${IC.trash}</button>`);
-  c.querySelector('.del').onclick=()=>{a.memory=a.memory.filter(x=>x.id!==m.id);save();memoryTab(pane,a);};pane.appendChild(c);});
-}
-function phrasesTab(pane,a){
- const add=el('button','btn primary full','添加快捷短语');add.style.margin='6px 0 12px';
- add.onclick=()=>{const t=prompt('短语标题');if(!t)return;const c=prompt('短语内容');if(c==null)return;a.phrases.push({id:uid(),title:t,content:c});save();phrasesTab(pane,a);};
- pane.innerHTML='';pane.appendChild(add);
- if(!a.phrases.length){pane.appendChild(el('div','field-lbl','暂无快捷短语'));return;}
- a.phrases.forEach(p=>{const c=el('div','list-card',`<div class="col"><div class="nm" style="font-size:16px">${esc(p.title)}</div><div class="sub">${esc(p.content)}</div></div><button class="del">${IC.trash}</button>`);
-  c.querySelector('.del').onclick=()=>{a.phrases=a.phrases.filter(x=>x.id!==p.id);save();phrasesTab(pane,a);};pane.appendChild(c);});
-}
-
-/* ================= 供应商列表 ================= */
-function providersScreen(){
- const sc=screen('供应商',{actions:[
-  {icon:IC.check,onClick:()=>toast('批量选择')},
-  {icon:IC.cloudDown,onClick:()=>toast('导入供应商')},
-  {icon:IC.plus,onClick:()=>{const p={id:uid(),name:'新供应商',type:'OpenAI',group:'其他',apiKey:'',baseUrl:'',apiPath:'/chat/completions',enabled:true,multiKey:false,responseApi:false,models:[]};S.providers.push(p);save();openScreen(providerDetailScreen(p));refresh();}}
- ]});
- const b=sc._body;
- const sb=el('div','search-bar',`${IC.earth}<input placeholder="搜索供应商或分组">`);
- const wrap=el('div');b.appendChild(sb);b.appendChild(wrap);
- function refresh(){wrap.innerHTML='';
-  const q=(sb.querySelector('input').value||'').trim();
-  const list=S.providers.filter(p=>!q||p.name.includes(q)||(p.group||'').includes(q));
-  const box=el('div','prov-wrap');
-  list.forEach((p,i)=>{
-   if(i)box.appendChild(el('div','row-div'));
-   const row=el('div','prov-row',`<div class="av">${esc(initial(p.name))}</div><div class="nm">${esc(p.name)}</div><span class="${p.enabled?'badge-on':'badge-off'}">${p.enabled?'启用':'禁用'}</span><span class="chev" style="color:color-mix(in srgb,var(--on-surface) 35%,transparent)">${IC.chev}</span>`);
-   row.onclick=()=>openScreen(providerDetailScreen(p));box.appendChild(row);
-  });
-  wrap.appendChild(box);
- }
- sb.querySelector('input').oninput=refresh;refresh();return sc;
-}
-
-/* ================= 供应商详情（配置/模型双Tab）================= */
-function providerDetailScreen(p){
- let tab=0;
- const sc=screen(p.name,{avatar:initial(p.name),actions:configActions()});
- const b=sc._body;const pane=el('div');b.appendChild(pane);
- const tabbar=el('div','bottom-tabs');
- function actionsFor(){return tab===0?configActions():modelActions();}
- function configActions(){return[
-  {icon:IC.pulse,onClick:()=>testConn(p)},
-  {icon:IC.share,onClick:()=>toast('分享供应商')},
-  {icon:IC.trash,danger:true,onClick:()=>{if(confirm('删除供应商？')){S.providers=S.providers.filter(x=>x.id!==p.id);save();closeScreen(sc);}}}
- ];}
- function modelActions(){return[
-  {icon:IC.check,onClick:()=>toast('多选')},
-  {icon:IC.share,onClick:()=>toast('分享')},
-  {icon:IC.trash,danger:true,onClick:()=>{if(confirm('删除供应商？')){S.providers=S.providers.filter(x=>x.id!==p.id);save();closeScreen(sc);}}}
- ];}
- function redrawBar(){
-  const bar=sc.querySelector('.screen-bar');bar.querySelectorAll('.sb-act').forEach(x=>x.remove());
-  actionsFor().forEach(a=>{const bt=el('button','sb-act'+(a.danger?' danger':''),a.icon);bt.onclick=a.onClick;bar.appendChild(bt);});
- }
- function drawTabs(){tabbar.innerHTML='';
-  [['配置',IC.settings2],['模型',IC.boxes]].forEach((t,i)=>{const it=el('button','bt-item'+(i===tab?' active':''),`<span>${t[1]}</span><span>${t[0]}</span>`);it.onclick=()=>{tab=i;drawTabs();drawPane();redrawBar();};tabbar.appendChild(it);});}
+ function drawPane(){pane.innerHTML='';if(cur===0)basicTab(pane,a,sc);else if(cur===1)promptTab(pane,a);else if(cur===2)memoryTab(pane,a);else phrasesTab(pane,a);}
+ b.appendChild(tabbar);b.appendChild(pane);drawTabs();drawPane();return sc;}
+function basicTab(pane,a,sc){const idc=el('div','big-card');const wrap=el('div','id-card',`<div class="big-av">${esc(initial(a.name))}</div>`);const col=el('div','id-col',`<div class="field-lbl" style="margin-top:0">助手名称</div>`);const nm=el('input','field-in');nm.value=a.name;nm.oninput=()=>{a.name=nm.value;save();renderDrawer();};col.appendChild(nm);wrap.appendChild(col);idc.appendChild(wrap);pane.appendChild(idc);
+ pane.appendChild(card([navRow(IC.thermo,'Temperature',a.temperature==null?'已关闭':a.temperature.toFixed(2),()=>paramSheet(a,'temperature','Temperature',0,2,0.05,0.6,sc)),navRow(IC.wand,'Top P',a.topP==null?'已关闭（使用服务商默认）':a.topP.toFixed(2),()=>paramSheet(a,'topP','Top P',0,1,0.05,1,sc)),navRow(IC.msgsq,'上下文消息数量',String(a.contextMessages),()=>paramSheet(a,'contextMessages','上下文消息数量',1,256,1,64,sc,true)),navRow(IC.brain,'思考预算',String(a.thinkingBudget||0),()=>paramSheet(a,'thinkingBudget','思考预算',0,32768,256,0,sc,true)),navRow(IC.hash,'最大 Token 数',a.maxTokens==null?'无限制':String(a.maxTokens),()=>paramSheet(a,'maxTokens','最大 Token 数',0,32768,256,null,sc,true)),swRow(IC.user,'使用助手头像',null,()=>a.useAvatar,v=>{a.useAvatar=v;renderMessages();}),swRow(IC.caseS,'使用助手名字',null,()=>a.useName,v=>{a.useName=v;renderMessages();}),swRow(IC.zap,'流式输出',null,()=>a.streaming,v=>a.streaming=v)]));
+ const mc=el('div','big-card');mc.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span>${IC.msgsq}</span><b style="font-size:17px">聊天模型</b></div>`;const row=el('div','model-row');row.style.cursor='pointer';row.innerHTML=`<div class="mav">${IC.bot}</div><div class="mcol"><div class="mnm">${esc(a.chatModel?a.chatModel.name:S.model.name)}</div></div>`;row.onclick=()=>modelSelector(m=>{a.chatModel=m;save();closeScreen(sc);openScreen(assistantEditScreen(a));});mc.appendChild(row);pane.appendChild(mc);
+ const bg=el('div','big-card');bg.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span>${IC.img}</span><b style="font-size:17px">聊天背景</b></div>`;const bgbtn=el('button','btn ghost full',a.background?'更换背景图':'选择背景图');bgbtn.onclick=()=>{const inp=el('input');inp.type='file';inp.accept='image/*';inp.onchange=()=>{const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{a.background=r.result;save();toast('背景已设置');};r.readAsDataURL(f);};inp.click();};bg.appendChild(bgbtn);if(a.background){const rm=el('button','btn danger full','移除背景');rm.style.marginTop='10px';rm.onclick=()=>{a.background=null;save();closeScreen(sc);openScreen(assistantEditScreen(a));};bg.appendChild(rm);}pane.appendChild(bg);}
+function paramSheet(a,key,label,min,max,step,def,sc,int){sheet(label,sh=>{const swWrap=el('div','sw-row');swWrap.style.padding='0 0 8px';swWrap.innerHTML=`<div class="txt"><div class="l">启用</div></div>`;const sw=el('button','ios-sw'+(a[key]!=null?' on':''));const box=el('div');function draw(){box.innerHTML='';if(a[key]==null)return;box.appendChild(sliderRow(label,min,max,step,()=>a[key],v=>{a[key]=int?Math.round(v):v;save();},v=>int?String(Math.round(v)):(+v).toFixed(2)));}sw.onclick=()=>{if(a[key]==null)a[key]=def==null?min:def;else a[key]=null;sw.classList.toggle('on',a[key]!=null);save();draw();};swWrap.appendChild(sw);sh.appendChild(swWrap);sh.appendChild(box);draw();const done=el('button','btn primary full','完成');done.style.marginTop='14px';done.onclick=()=>{closeSheet();closeScreen(sc);openScreen(assistantEditScreen(a));};sh.appendChild(done);});}
+function promptTab(pane,a){pane.appendChild(el('div','field-lbl','系统提示词'));const ta=el('textarea','field-in');ta.value=a.prompt;ta.style.minHeight='240px';ta.oninput=()=>{a.prompt=ta.value;save();};pane.appendChild(ta);}
+function memoryTab(pane,a){const add=el('button','btn primary full','添加记忆');add.style.margin='6px 0 12px';add.onclick=()=>{const v=prompt('记忆内容');if(v){a.memory.push({id:uid(),text:v});save();memoryTab(pane,a);}};pane.innerHTML='';pane.appendChild(add);if(!a.memory.length){pane.appendChild(el('div','field-lbl','暂无记忆'));return;}a.memory.forEach(m=>{const c=el('div','list-card',`<div class="col"><div class="sub" style="font-size:15px;color:var(--on-surface);white-space:normal">${esc(m.text)}</div></div><button class="del">${IC.trash}</button>`);c.querySelector('.del').onclick=()=>{a.memory=a.memory.filter(x=>x.id!==m.id);save();memoryTab(pane,a);};pane.appendChild(c);});}
+function phrasesTab(pane,a){const add=el('button','btn primary full','添加快捷短语');add.style.margin='6px 0 12px';add.onclick=()=>{const t=prompt('短语标题');if(!t)return;const c=prompt('短语内容');if(c==null)return;a.phrases.push({id:uid(),title:t,content:c});save();phrasesTab(pane,a);};pane.innerHTML='';pane.appendChild(add);if(!a.phrases.length){pane.appendChild(el('div','field-lbl','暂无快捷短语'));return;}a.phrases.forEach(p=>{const c=el('div','list-card',`<div class="col"><div class="nm" style="font-size:16px">${esc(p.title)}</div><div class="sub">${esc(p.content)}</div></div><button class="del">${IC.trash}</button>`);c.querySelector('.del').onclick=()=>{a.phrases=a.phrases.filter(x=>x.id!==p.id);save();phrasesTab(pane,a);};pane.appendChild(c);});}
+function providersScreen(){const sc=screen('供应商',{actions:[{icon:IC.checkc,onClick:()=>toast('批量选择')},{icon:IC.cloudDown,onClick:()=>toast('导入供应商')},{icon:IC.plus,onClick:()=>{const p={id:uid(),name:'新供应商',type:'OpenAI',group:'其他',apiKey:'',baseUrl:'',apiPath:'/chat/completions',enabled:true,multiKey:false,responseApi:false,models:[]};S.providers.push(p);save();openScreen(providerDetailScreen(p));refresh();}}]});const b=sc._body;const sb=el('div','search-bar',`${IC.earth}<input placeholder="搜索供应商或分组">`);const wrap=el('div');b.appendChild(sb);b.appendChild(wrap);
+ function refresh(){wrap.innerHTML='';const q=(sb.querySelector('input').value||'').trim();const list=S.providers.filter(p=>!q||p.name.includes(q)||(p.group||'').includes(q));const box=el('div','prov-wrap');list.forEach((p,i)=>{if(i)box.appendChild(el('div','row-div'));const row=el('div','prov-row',`<div class="av">${esc(initial(p.name))}</div><div class="nm">${esc(p.name)}</div><span class="${p.enabled?'badge-on':'badge-off'}">${p.enabled?'启用':'禁用'}</span><span class="chev" style="color:color-mix(in srgb,var(--on-surface) 35%,transparent)">${IC.chev}</span>`);row.onclick=()=>openScreen(providerDetailScreen(p));box.appendChild(row);});wrap.appendChild(box);}
+ sb.querySelector('input').oninput=refresh;refresh();return sc;}
+function providerDetailScreen(p){let tab=0;const sc=screen(p.name,{avatar:initial(p.name),actions:configActions()});const b=sc._body;const pane=el('div');b.appendChild(pane);const tabbar=el('div','bottom-tabs');
+ function configActions(){return[{icon:IC.pulse,onClick:()=>testConn(p)},{icon:IC.share,onClick:()=>toast('分享供应商')},{icon:IC.trash,danger:true,onClick:()=>{if(confirm('删除供应商？')){S.providers=S.providers.filter(x=>x.id!==p.id);save();closeScreen(sc);}}}];}
+ function modelActions(){return[{icon:IC.checkc,onClick:()=>toast('多选')},{icon:IC.share,onClick:()=>toast('分享')},{icon:IC.trash,danger:true,onClick:()=>{if(confirm('删除供应商？')){S.providers=S.providers.filter(x=>x.id!==p.id);save();closeScreen(sc);}}}];}
+ function redrawBar(){const bar=sc.querySelector('.screen-bar');bar.querySelectorAll('.sb-act').forEach(x=>x.remove());(tab===0?configActions():modelActions()).forEach(a=>{const bt=el('button','sb-act'+(a.danger?' danger':''),a.icon);bt.onclick=a.onClick;bar.appendChild(bt);});}
+ function drawTabs(){tabbar.innerHTML='';[['配置',IC.settings2],['模型',IC.boxes]].forEach((t,i)=>{const it=el('button','bt-item'+(i===tab?' active':''),`<span>${t[1]}</span><span>${t[0]}</span>`);it.onclick=()=>{tab=i;drawTabs();drawPane();redrawBar();};tabbar.appendChild(it);});}
  function drawPane(){pane.innerHTML='';tab===0?configTab(pane,p):modelsTab(pane,p,sc);}
- drawPane();b.appendChild(tabbar);drawTabs();return sc;
-}
-function configTab(pane,p){
- pane.appendChild(el('div','sec-header','管理'));
- pane.appendChild(card([
-  navRow('','供应商类型',p.type,()=>{sheet('供应商类型',sh=>{['OpenAI','Gemini','Claude'].forEach(t=>sh.appendChild(sheetItem(t,{checked:p.type===t,onClick:()=>{p.type=t;save();closeSheet();}})));});}),
-  navRow('','分组',p.group||'其他',()=>{const v=prompt('分组',p.group||'其他');if(v!=null){p.group=v;save();}}),
-  swRow('','是否启用',null,()=>p.enabled,v=>p.enabled=v),
-  swRow('','多Key模式',null,()=>p.multiKey,v=>p.multiKey=v),
-  swRow('','Response API (/responses)',null,()=>p.responseApi,v=>p.responseApi=v),
-  navRow('','获取账户余额',null,()=>toast('获取余额')),
-  navRow('','网络代理',null,()=>toast('网络代理'))
- ]));
- mkField(pane,'名称',p.name,v=>{p.name=v;});
- mkField(pane,'API Key',p.apiKey,v=>{p.apiKey=v;},true);
- mkField(pane,'API Base URL',p.baseUrl,v=>{p.baseUrl=v;});
- mkField(pane,'API 路径',p.apiPath,v=>{p.apiPath=v;});
-}
-function mkField(pane,label,val,cb,pwd){
- pane.appendChild(el('div','field-lbl',label));
- const wrap=el('div','field-wrap');
- const i=el('input','field-in');i.value=val||'';if(pwd)i.type='password';
- i.oninput=()=>{cb(i.value);save();};wrap.appendChild(i);
- if(pwd){const eye=el('button','eye',IC.eye);let show=false;eye.onclick=()=>{show=!show;i.type=show?'text':'password';eye.innerHTML=show?IC.eyeoff:IC.eye;};wrap.appendChild(eye);}
- pane.appendChild(wrap);
-}
-function capTags(cap){
- cap=cap||{};const t=[];
- if(cap.chat!==false)t.push('<span class="tag chat">聊天</span>');
- t.push(`<span class="tag mod">T${cap.vision?' 🖼':''} › T</span>`);
- if(cap.tool)t.push(`<span class="tag tool">🔨</span>`);
- t.push(`<span class="tag ab">⚛</span>`);
- return t.join('');
-}
-function modelsTab(pane,p,sc){
- if(!p.models.length)pane.appendChild(el('div','field-lbl','暂无模型，点下方“获取”或“添加新模型”'));
- p.models.forEach(m=>{
-  const row=el('div','model-row',`<div class="mav">${IC.bot}</div><div class="mcol"><div class="mnm">${esc(m.name)}</div><div class="tag-wrap">${capTags(m.cap)}</div></div><button class="mset">${IC.sliders}</button>`);
-  row.querySelector('.mset').onclick=()=>modelEdit(p,m,sc);
-  pane.appendChild(row);
- });
- const tb=el('div','model-toolbar');
- const fetchBtn=el('button','pill outline',`${IC.boxes}获取`);
- fetchBtn.onclick=()=>fetchModels(p,sc);
- const addBtn=el('button','pill fill',`${IC.plus}添加新模型`);
- addBtn.onclick=()=>{const id=prompt('模型ID');if(id){p.models.push({id,name:id,fav:false,cap:{chat:true,vision:false,tool:false,reason:false}});save();closeScreen(sc);openScreen(providerDetailScreen(p));}};
- const delBtn=el('button','pill round-danger',IC.trash);
- delBtn.onclick=()=>{if(p.models.length&&confirm('删除全部模型？')){p.models=[];save();closeScreen(sc);openScreen(providerDetailScreen(p));}};
- tb.appendChild(fetchBtn);tb.appendChild(addBtn);tb.appendChild(delBtn);pane.appendChild(tb);
-}
-function modelEdit(p,m,sc){
- sheet(m.name,sh=>{
-  mkField(sh,'模型名称',m.name,v=>m.name=v);
-  sh.appendChild(swRow('','视觉(图片输入)',null,()=>!!m.cap.vision,v=>m.cap.vision=v));
-  sh.appendChild(swRow('','工具调用',null,()=>!!m.cap.tool,v=>m.cap.tool=v));
-  sh.appendChild(swRow('','推理',null,()=>!!m.cap.reason,v=>m.cap.reason=v));
-  const del=el('button','btn danger full','删除该模型');del.style.marginTop='14px';
-  del.onclick=()=>{p.models=p.models.filter(x=>x!==m);save();closeSheet();closeScreen(sc);openScreen(providerDetailScreen(p));};
-  const done=el('button','btn primary full','完成');done.style.marginTop='10px';
-  done.onclick=()=>{save();closeSheet();closeScreen(sc);openScreen(providerDetailScreen(p));};
-  sh.appendChild(del);sh.appendChild(done);
- });
-}
-function fetchModels(p,sc){
- // 演示：本地拉取模型（真实应请求 baseUrl+/models）
- toast('正在获取模型…');
- setTimeout(()=>{
-  const demo=[
-   {id:'deepseek-v4-flash',name:'deepseek-v4-flash',fav:false,cap:{chat:true,vision:false,tool:true,reason:false}},
-   {id:'deepseek-v4-flash-0731',name:'deepseek-v4-flash-0731',fav:false,cap:{chat:true,vision:false,tool:true,reason:false}},
-   {id:'deepseek-v4-pro',name:'deepseek-v4-pro',fav:false,cap:{chat:true,vision:false,tool:true,reason:true}}
-  ];
-  sheet('获取到模型',sh=>{
-   demo.forEach(m=>{const exists=p.models.some(x=>x.id===m.id);
-    sh.appendChild(sheetItem(m.name,{sub:exists?'已存在':'点击添加',icon:IC.bot,checked:exists,onClick:()=>{if(!exists){p.models.push(m);save();toast('已添加');closeSheet();closeScreen(sc);openScreen(providerDetailScreen(p));}}}));});
-   const all=el('button','btn primary full','全部添加');all.style.marginTop='12px';
-   all.onclick=()=>{demo.forEach(m=>{if(!p.models.some(x=>x.id===m.id))p.models.push(m);});save();closeSheet();closeScreen(sc);openScreen(providerDetailScreen(p));};
-   sh.appendChild(all);
-  });
- },600);
-}
-function testConn(p){
- sheet('连接测试',sh=>{
-  sh.appendChild(el('div','field-lbl','测试供应商 '+p.name));
-  const st=el('div');st.style.padding='12px 4px';st.textContent='测试中…';sh.appendChild(st);
-  setTimeout(()=>{const ok=!!p.apiKey&&!!p.baseUrl;st.innerHTML=ok?`<span style="color:var(--ok)">✓ 连接配置有效（演示）</span>`:`<span style="color:var(--error)">✕ 缺少 API Key 或 Base URL</span>`;},700);
- });
-}
-
-/* ================= 模型选择器 ================= */
-function modelSelector(onPick){
- sheet(null,sh=>{
-  sh.querySelector('.sheet-grip').after(el('div','search-bar',`${IC.earth}<input id="ms-search" placeholder="搜索模型或服务商">`));
-  const listBox=el('div');sh.appendChild(listBox);
-  const chips=el('div','prov-chips');sh.appendChild(chips);
-  let filter='';let onlyPid=null;
-  function draw(){
-   listBox.innerHTML='';
-   S.providers.filter(p=>p.enabled&&(!onlyPid||p.id===onlyPid)).forEach(p=>{
-    const models=p.models.filter(m=>!filter||m.name.toLowerCase().includes(filter)||p.name.toLowerCase().includes(filter));
-    if(!models.length)return;
-    listBox.appendChild(el('div','grp-label',p.name));
-    models.forEach(m=>{
-     const sel=S.model.id===m.id&&S.model.provider===p.name;
-     const it=el('div','sheet-item'+(sel?'':''));
-     it.style.alignItems='flex-start';
-     it.innerHTML=`<span class="si-ic" style="margin-top:2px">${IC.bot}</span><div class="col"><div style="font-size:16px;margin-bottom:6px">${esc(m.name)}</div><div class="tag-wrap">${capTags(m.cap)}</div></div>`;
-     const heart=el('button','heart'+(m.fav?'':' off'),IC.heart);
-     heart.onclick=e=>{e.stopPropagation();m.fav=!m.fav;save();heart.className='heart'+(m.fav?'':' off');};
-     it.appendChild(heart);
-     it.onclick=e=>{if(e.target.closest('.heart'))return;onPick({provider:p.name,pid:p.id,id:m.id,name:m.name});closeSheet();};
-     if(sel)it.style.background='color-mix(in srgb,var(--primary) 8%,transparent)';
-     listBox.appendChild(it);
-    });
-   });
-  }
-  function drawChips(){chips.innerHTML='';
-   const allc=el('button','prov-chip'+(!onlyPid?' active':''),`全部`);allc.onclick=()=>{onlyPid=null;drawChips();draw();};chips.appendChild(allc);
-   S.providers.filter(p=>p.enabled).forEach(p=>{const c=el('button','prov-chip'+(onlyPid===p.id?' active':''),`<span class="pc-av">${esc(initial(p.name))}</span>${esc(p.name)}`);c.onclick=()=>{onlyPid=(onlyPid===p.id?null:p.id);drawChips();draw();};chips.appendChild(c);});
-  }
-  drawChips();draw();
-  setTimeout(()=>{const s=$('ms-search');if(s)s.oninput=()=>{filter=s.value.trim().toLowerCase();draw();};},0);
- });
-}
-
-/* ================= +工具面板 ================= */
-const TOOLS=[
- {k:'camera',n:'拍照',ic:IC.camera},
- {k:'album',n:'相册',ic:IC.album},
- {k:'upload',n:'上传文件',ic:IC.upload},
- {k:'clear',n:'清除上下文',ic:IC.eraser}
-];
-function toggleTools(){
- const p=$('tools-panel');
- if(!p.hidden){p.hidden=true;return;}
- p.innerHTML='';
- TOOLS.forEach(t=>{const b=el('button','tool-item',`<span class="ic">${t.ic}</span>${t.n}`);
-  b.onclick=()=>{p.hidden=true;
-   if(t.k==='clear'){const c=curConv();if(c){c.msgs=[];save();renderMessages();}toast('已清除上下文');}
-   else toast(t.n+'（本地演示）');
-  };p.appendChild(b);});
- p.hidden=false;
-}
-
-/* ================= 助手切换 ================= */
-function assistantSheet(){
- sheet('选择助手',sh=>{
-  S.assistants.forEach(a=>sh.appendChild(sheetItem(a.name,{icon:`<div class="s-av">${esc(initial(a.name))}</div>`,checked:a.id===S.curA,sub:a.prompt.slice(0,24),onClick:()=>{S.curA=a.id;save();renderDrawer();renderMessages();closeSheet();toast('已切换助手');}})));
-  const m=el('button','btn primary full','管理助手');m.style.marginTop='12px';
-  m.onclick=()=>{closeSheet();closeDrawer();openScreen(assistantListScreen());};sh.appendChild(m);
- });
-}
-
-/* ================= 绑定 ================= */
+ drawPane();b.appendChild(tabbar);drawTabs();return sc;}
+function configTab(pane,p){pane.appendChild(el('div','sec-header','管理'));pane.appendChild(card([navRow('','供应商类型',p.type,()=>{sheet('供应商类型',sh=>{['OpenAI','Gemini','Claude'].forEach(t=>sh.appendChild(sheetItem(t,{checked:p.type===t,onClick:()=>{p.type=t;save();closeSheet();}})));});}),navRow('','分组',p.group||'其他',()=>{const v=prompt('分组',p.group||'其他');if(v!=null){p.group=v;save();}}),swRow('','是否启用',null,()=>p.enabled,v=>p.enabled=v),swRow('','多Key模式',null,()=>p.multiKey,v=>p.multiKey=v),swRow('','Response API (/responses)',null,()=>p.responseApi,v=>p.responseApi=v),navRow('','获取账户余额',null,()=>toast('获取余额')),navRow('','网络代理',null,()=>toast('网络代理'))]));mkField(pane,'名称',p.name,v=>{p.name=v;});mkField(pane,'API Key',p.apiKey,v=>{p.apiKey=v;},true);mkField(pane,'API Base URL',p.baseUrl,v=>{p.baseUrl=v;});mkField(pane,'API 路径',p.apiPath,v=>{p.apiPath=v;});}
+function mkField(pane,label,val,cb,pwd){pane.appendChild(el('div','field-lbl',label));const wrap=el('div','field-wrap');const i=el('input','field-in');i.value=val||'';if(pwd)i.type='password';i.oninput=()=>{cb(i.value);save();};wrap.appendChild(i);if(pwd){const eye=el('button','eye',IC.eye);let show=false;eye.onclick=()=>{show=!show;i.type=show?'text':'password';eye.innerHTML=show?IC.eyeoff:IC.eye;};wrap.appendChild(eye);}pane.appendChild(wrap);}
+function capTags(cap){cap=cap||{};const t=[];if(cap.chat!==false)t.push('<span class="tag chat">聊天</span>');t.push(`<span class="tag mod">T${cap.vision?' 🖼':''} › T</span>`);if(cap.tool)t.push('<span class="tag tool">🔨</span>');t.push('<span class="tag ab">⚛</span>');return t.join('');}
+function modelsTab(pane,p,sc){if(!p.models.length)pane.appendChild(el('div','field-lbl','暂无模型，点下方“获取”或“添加新模型”'));p.models.forEach(m=>{const row=el('div','model-row',`<div class="mav">${IC.bot}</div><div class="mcol"><div class="mnm">${esc(m.name)}</div><div class="tag-wrap">${capTags(m.cap)}</div></div><button class="mset">${IC.sliders}</button>`);row.querySelector('.mset').onclick=()=>modelEdit(p,m,sc);pane.appendChild(row);});const tb=el('div','model-toolbar');const fetchBtn=el('button','pill outline',`${IC.boxes}获取`);fetchBtn.onclick=()=>fetchModels(p,sc);const addBtn=el('button','pill fill',`${IC.plus}添加新模型`);addBtn.onclick=()=>{const id=prompt('模型ID');if(id){p.models.push({id,name:id,fav:false,cap:{chat:true,vision:false,tool:false,reason:false}});save();closeScreen(sc);openScreen(providerDetailScreen(p));}};const delBtn=el('button','pill round-danger',IC.trash);delBtn.onclick=()=>{if(p.models.length&&confirm('删除全部模型？')){p.models=[];save();closeScreen(sc);openScreen(providerDetailScreen(p));}};tb.appendChild(fetchBtn);tb.appendChild(addBtn);tb.appendChild(delBtn);pane.appendChild(tb);}
+function modelEdit(p,m,sc){sheet(m.name,sh=>{mkField(sh,'模型名称',m.name,v=>m.name=v);sh.appendChild(swRow('','视觉(图片输入)',null,()=>!!m.cap.vision,v=>m.cap.vision=v));sh.appendChild(swRow('','工具调用',null,()=>!!m.cap.tool,v=>m.cap.tool=v));sh.appendChild(swRow('','推理',null,()=>!!m.cap.reason,v=>m.cap.reason=v));const del=el('button','btn danger full','删除该模型');del.style.marginTop='14px';del.onclick=()=>{p.models=p.models.filter(x=>x!==m);save();closeSheet();closeScreen(sc);openScreen(providerDetailScreen(p));};const done=el('button','btn primary full','完成');done.style.marginTop='10px';done.onclick=()=>{save();closeSheet();closeScreen(sc);openScreen(providerDetailScreen(p));};sh.appendChild(del);sh.appendChild(done);});}
+function fetchModels(p,sc){toast('正在获取模型…');setTimeout(()=>{const demo=[{id:'deepseek-v4-flash',name:'deepseek-v4-flash',fav:false,cap:{chat:true,vision:false,tool:true,reason:false}},{id:'deepseek-v4-flash-0731',name:'deepseek-v4-flash-0731',fav:false,cap:{chat:true,vision:false,tool:true,reason:false}},{id:'deepseek-v4-pro',name:'deepseek-v4-pro',fav:false,cap:{chat:true,vision:false,tool:true,reason:true}}];sheet('获取到模型',sh=>{demo.forEach(m=>{const exists=p.models.some(x=>x.id===m.id);sh.appendChild(sheetItem(m.name,{sub:exists?'已存在':'点击添加',icon:IC.bot,checked:exists,onClick:()=>{if(!exists){p.models.push(m);save();toast('已添加');closeSheet();closeScreen(sc);openScreen(providerDetailScreen(p));}}}));});const all=el('button','btn primary full','全部添加');all.style.marginTop='12px';all.onclick=()=>{demo.forEach(m=>{if(!p.models.some(x=>x.id===m.id))p.models.push(m);});save();closeSheet();closeScreen(sc);openScreen(providerDetailScreen(p));};sh.appendChild(all);});},600);}
+function testConn(p){sheet('连接测试',sh=>{sh.appendChild(el('div','field-lbl','测试供应商 '+p.name));const st=el('div');st.style.padding='12px 4px';st.textContent='测试中…';sh.appendChild(st);setTimeout(()=>{const ok=!!p.apiKey&&!!p.baseUrl;st.innerHTML=ok?`<span style="color:var(--ok)">✓ 连接配置有效（演示）</span>`:`<span style="color:var(--error)">✕ 缺少 API Key 或 Base URL</span>`;},700);});}
+function modelSelector(onPick){sheet(null,sh=>{sh.querySelector('.sheet-grip').after(el('div','search-bar',`${IC.earth}<input id="ms-search" placeholder="搜索模型或服务商">`));const listBox=el('div');sh.appendChild(listBox);const chips=el('div','prov-chips');sh.appendChild(chips);let filter='';let onlyPid=null;
+ function draw(){listBox.innerHTML='';S.providers.filter(p=>p.enabled&&(!onlyPid||p.id===onlyPid)).forEach(p=>{const models=p.models.filter(m=>!filter||m.name.toLowerCase().includes(filter)||p.name.toLowerCase().includes(filter));if(!models.length)return;listBox.appendChild(el('div','grp-label',p.name));models.forEach(m=>{const sel=S.model.id===m.id&&S.model.provider===p.name;const it=el('div','sheet-item');it.style.alignItems='flex-start';it.innerHTML=`<span class="si-ic" style="margin-top:2px">${IC.bot}</span><div class="col"><div style="font-size:16px;margin-bottom:6px">${esc(m.name)}</div><div class="tag-wrap">${capTags(m.cap)}</div></div>`;const heart=el('button','heart'+(m.fav?'':' off'),IC.heart);heart.onclick=e=>{e.stopPropagation();m.fav=!m.fav;save();heart.className='heart'+(m.fav?'':' off');};it.appendChild(heart);it.onclick=e=>{if(e.target.closest('.heart'))return;onPick({provider:p.name,pid:p.id,id:m.id,name:m.name});closeSheet();};if(sel)it.style.background='color-mix(in srgb,var(--primary) 8%,transparent)';listBox.appendChild(it);});});}
+ function drawChips(){chips.innerHTML='';const allc=el('button','prov-chip'+(!onlyPid?' active':''),'全部');allc.onclick=()=>{onlyPid=null;drawChips();draw();};chips.appendChild(allc);S.providers.filter(p=>p.enabled).forEach(p=>{const c=el('button','prov-chip'+(onlyPid===p.id?' active':''),`<span class="pc-av">${esc(initial(p.name))}</span>${esc(p.name)}`);c.onclick=()=>{onlyPid=(onlyPid===p.id?null:p.id);drawChips();draw();};chips.appendChild(c);});}
+ drawChips();draw();setTimeout(()=>{const s=$('ms-search');if(s)s.oninput=()=>{filter=s.value.trim().toLowerCase();draw();};},0);});}
+const TOOLS=[{k:'camera',n:'拍照',ic:IC.camera},{k:'album',n:'相册',ic:IC.album},{k:'upload',n:'上传文件',ic:IC.upload},{k:'clear',n:'清除上下文',ic:IC.eraser}];
+function toggleTools(){const p=$('tools-panel');if(!p.hidden){p.hidden=true;return;}p.innerHTML='';TOOLS.forEach(t=>{const b=el('button','tool-item',`<span class="ic">${t.ic}</span>${t.n}`);b.onclick=()=>{p.hidden=true;if(t.k==='clear'){const c=curConv();if(c){c.msgs=[];save();renderMessages();}toast('已清除上下文');}else toast(t.n+'（本地演示）');};p.appendChild(b);});p.hidden=false;}
+function assistantSheet(){sheet('选择助手',sh=>{S.assistants.forEach(a=>sh.appendChild(sheetItem(a.name,{icon:`<div class="s-av">${esc(initial(a.name))}</div>`,checked:a.id===S.curA,sub:a.prompt.slice(0,24),onClick:()=>{S.curA=a.id;save();renderDrawer();renderMessages();closeSheet();toast('已切换助手');}})));const m=el('button','btn primary full','管理助手');m.style.marginTop='12px';m.onclick=()=>{closeSheet();closeDrawer();openScreen(assistantListScreen());};sh.appendChild(m);});}
 function bind(){
- $('btn-drawer').onclick=openDrawer;
- $('scrim').onclick=closeDrawer;
+ $('btn-drawer').onclick=openDrawer;$('scrim').onclick=closeDrawer;
  $('btn-newchat').onclick=()=>{const c={id:uid(),title:'新对话',msgs:[],ts:Date.now()};S.convs.unshift(c);S.cur=c.id;save();renderMessages();renderDrawer();updateTopbar();};
  $('btn-minimap').onclick=()=>toast('导航');
  $('title-sub').onclick=()=>modelSelector(m=>{S.model=m;save();updateTopbar();});
  $('btn-model').onclick=()=>modelSelector(m=>{S.model=m;save();updateTopbar();});
  $('btn-settings').onclick=()=>{closeDrawer();openScreen(settingsScreen());};
- $('btn-translate').onclick=()=>toast('翻译');
- $('btn-history').onclick=()=>toast('历史');
- $('btn-search-mode').onclick=()=>toast('切换搜索模式');
- $('assistant-bar').onclick=assistantSheet;
- $('btn-more').onclick=toggleTools;
- $('btn-send').onclick=send;
+ $('btn-translate').onclick=()=>toast('翻译');$('btn-history').onclick=()=>toast('历史');$('btn-search-mode').onclick=()=>toast('切换搜索模式');
+ $('assistant-bar').onclick=assistantSheet;$('btn-more').onclick=toggleTools;$('btn-send').onclick=send;
  $('btn-search').onclick=function(){S.settings.search=!S.settings.search;this.classList.toggle('active',S.settings.search);save();};
  $('btn-reason').onclick=function(){S.settings.reason=!S.settings.reason;this.classList.toggle('active',S.settings.reason);save();};
  $('btn-mcp').onclick=()=>toast('MCP / 工具');
- const f=$('input-field');
- f.addEventListener('input',()=>{autoGrow();refreshSend();});
+ const f=$('input-field');f.addEventListener('input',()=>{autoGrow();refreshSend();});
  f.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&S.settings.enterToSend&&!matchMedia('(pointer:coarse)').matches){e.preventDefault();send();}});
  $('drawer-search-input').addEventListener('input',renderDrawer);
  matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{if(S.settings.mode==='system')applyMode();});
 }
-
-/* ================= 初始化 ================= */
-function init(){
- load();applyMode();bind();
- if(S.settings.search)$('btn-search').classList.add('active');
- if(S.settings.reason)$('btn-reason').classList.add('active');
- // 清空示例静态消息（HTML里的），用真实数据
- $('messages').innerHTML='';
- renderDrawer();renderMessages();updateTopbar();autoGrow();refreshSend();
-}
+function init(){load();applyMode();bind();if(S.settings.search)$('btn-search').classList.add('active');if(S.settings.reason)$('btn-reason').classList.add('active');$('messages').innerHTML='';renderDrawer();renderMessages();updateTopbar();autoGrow();refreshSend();}
 init();
 })();
