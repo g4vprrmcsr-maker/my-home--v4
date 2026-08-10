@@ -803,6 +803,13 @@ function applyKelivoLayout() {
   st.topbarAlpha = 100;
   saveState();
 }
+function updateKvSend() {
+  const sb = $("#send-btn"); if (!sb) return;
+  const it = $("#input-text");
+  if (state.settings.chatUi !== "kelivo" || streaming) { sb.classList.remove("kv-send-empty"); return; }
+  const has = (it && it.value.trim()) || (pendingImgs && pendingImgs.length);
+  sb.classList.toggle("kv-send-empty", !has);
+}
 let _kvOrigMenu = null, _kvOrigNew = null;
 function paintTopbarTitle() {
   const tt = $("#topbar-title");
@@ -813,27 +820,31 @@ function paintTopbarTitle() {
   if (newBtn && _kvOrigNew === null) _kvOrigNew = newBtn.innerHTML;
   let mapBtn = document.getElementById("kv-map-btn");
   if (isKv) {
-    if (menuBtn) menuBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
-    if (newBtn) newBtn.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/><path d="M12 8v6M9 11h6"/></svg>';
+    if (menuBtn) menuBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="3.5" y1="6" x2="20.5" y2="6"/><line x1="3.5" y1="12" x2="20.5" y2="12"/><line x1="3.5" y1="18" x2="20.5" y2="18"/></svg>';
+    if (newBtn) newBtn.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/><path d="M12 8v6M9 11h6"/></svg>';
     if (newBtn && !mapBtn) {
       mapBtn = el("button", "topbar-btn"); mapBtn.id = "kv-map-btn";
-      mapBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.1 5.5a2 2 0 0 0 1.8 0l3.6-1.8A1 1 0 0 1 21 4.6v12.8a1 1 0 0 1-.6.9l-4.5 2.3a2 2 0 0 1-1.8 0l-4.2-2.1a2 2 0 0 0-1.8 0l-3.6 1.8A1 1 0 0 1 3 19.4V6.6a1 1 0 0 1 .6-.9l4.5-2.3a2 2 0 0 1 1.8 0z"/><path d="M15 5.8v15M9 3.2v15"/></svg>';
+      mapBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.1 5.5a2 2 0 0 0 1.8 0l3.6-1.8A1 1 0 0 1 21 4.6v12.8a1 1 0 0 1-.6.9l-4.5 2.3a2 2 0 0 1-1.8 0l-4.2-2.1a2 2 0 0 0-1.8 0l-3.6 1.8A1 1 0 0 1 3 19.4V6.6a1 1 0 0 1 .6-.9l4.5-2.3a2 2 0 0 1 1.8 0z"/><path d="M15 5.8v15M9 3.2v15"/></svg>';
       mapBtn.onclick = () => toast("小地图");
       newBtn.parentNode.insertBefore(mapBtn, newBtn);
     }
     if (mapBtn) mapBtn.style.display = "";
     tt.innerHTML = "";
     const t1 = el("div", "", curSession().name);
-    t1.style.cssText = "line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px;font-weight:500;";
+    t1.style.cssText = "line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px;font-weight:500;";
     const p = curProvider();
     const t2 = el("div", "", (p.model || "") + (p.name ? " (" + p.name + ")" : ""));
-    t2.style.cssText = "font-size:11px;font-weight:500;line-height:1.15;margin-top:2px;color:color-mix(in srgb,var(--text-main) 60%,transparent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
+    t2.style.cssText = "font-size:11px;font-weight:500;line-height:1.2;margin-top:2px;color:color-mix(in srgb,var(--text-main) 60%,transparent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
     tt.appendChild(t1); tt.appendChild(t2);
+    const itx = $("#input-text");
+    if (itx && !itx._kvSendBound) { itx._kvSendBound = true; itx.addEventListener("input", updateKvSend); }
+    updateKvSend();
   } else {
     if (menuBtn && _kvOrigMenu !== null) menuBtn.innerHTML = _kvOrigMenu;
     if (newBtn && _kvOrigNew !== null) newBtn.innerHTML = _kvOrigNew;
     if (mapBtn) mapBtn.style.display = "none";
     tt.textContent = curSession().name;
+    const sb = $("#send-btn"); if (sb) sb.classList.remove("kv-send-empty");
   }
 }
 
@@ -1233,8 +1244,9 @@ function kvIcon(kind) {
   if (kind === "chevron") return W + '<path d="m6 9 6 6 6-6" ' + s + '/></svg>';
   if (kind === "vsleft")  return W + '<path d="m15 18-6-6 6-6" ' + s + '/></svg>';
   if (kind === "vsright") return W + '<path d="m9 18 6-6-6-6" ' + s + '/></svg>';
-  if (kind === "brain")   return '<svg viewBox="0 0 24 24" width="18" height="18"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.8.8 1.3 1.5 1.5 2.5" ' + s + '/><path d="M9 18h6" ' + s + '/><path d="M10 22h4" ' + s + '/></svg>';
-  return W + '<circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/><circle cx="5" cy="12" r="1.4" fill="currentColor"/></svg>';
+  if (kind === "stop")    return W + '<rect x="7" y="7" width="10" height="10" rx="2.5" fill="currentColor" stroke="none"/></svg>';
+  if (kind === "bulb")    return '<svg viewBox="0 0 24 24" width="17" height="17"><path d="M9 18h6" ' + s + '/><path d="M10 22h4" ' + s + '/><path d="M15.1 14c.2-1 .6-1.7 1.4-2.5A4.6 4.6 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.8.8 1.2 1.5 1.4 2.5" ' + s + '/></svg>';
+  return W + '<circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/><circle cx="5" cy="12" r="2" fill="currentColor"/></svg>';
 }
 function buildKvThink(m) {
   const st = state.settings;
@@ -1242,23 +1254,15 @@ function buildKvThink(m) {
   box.style.background = hslaOf(st.thinkHue, st.thinkSat, st.thinkLight, st.thinkAlpha);
   const ink = st.thinkLight < 45 ? "#e8e8e8" : "#4a4a4a";
   const head = el("div", "kv-think-head"); head.style.color = ink;
-  head.appendChild(el("span", "kv-think-label", "深度思考"));
-  if (m.thinkStart && m.thinkEnd && m.thinkEnd > m.thinkStart) {
-    head.appendChild(el("span", "kv-think-dur", "(" + ((m.thinkEnd - m.thinkStart) / 1000).toFixed(1) + "s)"));
-  }
-  const arrow = el("span", "kv-think-arrow");
-  arrow.innerHTML = kvIcon("chevron");
+  const bulb = el("span", "kv-think-bulb"); bulb.innerHTML = kvIcon("bulb");
+  head.appendChild(bulb);
+  let label = "深度思考";
+  if (m.thinkStart && m.thinkEnd && m.thinkEnd > m.thinkStart) label += " (" + ((m.thinkEnd - m.thinkStart) / 1000).toFixed(1) + "s)";
+  head.appendChild(el("span", "kv-think-label", label));
+  const arrow = el("span", "kv-think-arrow"); arrow.innerHTML = kvIcon("chevron");
   head.appendChild(arrow);
-  const step = el("div", "kv-think-step");
-  const rail = el("div", "kv-think-rail");
-  const sicon = el("span", "kv-think-stepicon"); sicon.innerHTML = kvIcon("brain");
-  const line = el("div", "kv-think-line");
-  rail.appendChild(sicon); rail.appendChild(line);
-  const wrap = el("div", "kv-think-bodywrap");
   const bodyd = el("div", "kv-think-body", m.think); bodyd.style.color = ink;
-  wrap.appendChild(bodyd);
-  step.appendChild(rail); step.appendChild(wrap);
-  box.appendChild(head); box.appendChild(step);
+  box.appendChild(head); box.appendChild(bodyd);
   head.onclick = () => {
     box.classList.toggle("open");
     arrow.style.transform = box.classList.contains("open") ? "rotate(180deg)" : "";
@@ -1391,7 +1395,8 @@ async function buildKelivoRow(m, gi, aiSrc, userSrc) {
     if (c) { bubble.style.background = c.bg; if (c.dark) bubble.style.color = "#f2f2f2"; }
   } else {
     if (st.aiBare) {
-      bubble.style.background = "none"; bubble.style.padding = "0"; bubble.style.maxWidth = "100%";
+      bubble.style.background = "none"; bubble.style.padding = "0";
+      bubble.style.width = "100%"; bubble.style.maxWidth = "100%";
     } else {
       const c = bubbleColorOf(false);
       bubble.style.width = "fit-content";
@@ -2143,7 +2148,9 @@ async function regenerate(m) {
 async function runStream(aiMsg, messages, isRegen) {
   streaming = true;
   const btn = $("#send-btn");
-  btn.textContent = "■";
+  const kv = state.settings.chatUi === "kelivo";
+  if (kv) { btn.innerHTML = kvIcon("stop"); btn.classList.remove("kv-send-empty"); }
+  else btn.textContent = "■";
   btn.disabled = false;
   btn.onclick = () => { if (abortCtrl) abortCtrl.abort(); };
   saveState();
@@ -2220,6 +2227,7 @@ async function runStream(aiMsg, messages, isRegen) {
     if (bubbleEl) bubbleEl.classList.remove("typing-cursor");
     saveState();
     await renderMessages(true);
+    updateKvSend();
   }
 }
 
