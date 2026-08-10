@@ -791,17 +791,18 @@ function applyKelivoLayout() {
   st.nameSize = 13; st.nameWeight = 500;
   st.timeFmt = "ymd"; st.timeAt = "above"; st.metaSize = 11; st.metaShade = 150;
   st.bubbleAlign = "side"; st.nameMid = false;
-  st.msgGap = 12; st.metaGap = 5; st.avBubbleGap = 8; st.msgBarGap = 8;
+  st.msgGap = 0; st.metaGap = 8; st.avBubbleGap = 8; st.msgBarGap = 8;
   st.aiBare = true;
   st.bubbleShape = "round-lg"; st.bubbleRadius = 16;
   st.bubblePadV = 12; st.bubblePadH = 12; st.bubbleMaxW = 75;
   st.bubbleTexture = "plain"; st.bubbleGlow = 0;
   st.userHue = 225; st.userSat = 28; st.userLight = 93; st.userAlpha = 100;
   st.aiHue = -1;
-  st.fontSize = 15.5; st.chatWeight = 400; st.chatLineH = 1.5; st.paraGap = 8;
+  st.fontSize = 15.7; st.chatWeight = 400; st.chatLineH = 1.5; st.paraGap = 8;
   st.msgBarOn = true; st.showToken = true; st.tokenInBar = true;
   saveState();
 }
+
 function paintTopbarTitle() {
   const tt = $("#topbar-title");
   if (!tt) return;
@@ -1204,27 +1205,36 @@ function kvTime(ts) {
          p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
 }
 function kvIcon(kind) {
-  const s = 'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"';
-  if (kind === "copy") return '<svg viewBox="0 0 24 24" width="16" height="16"><rect x="9" y="9" width="11" height="11" rx="2.5" ' + s + '/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H16" ' + s + '/></svg>';
-  if (kind === "roll") return '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" ' + s + '/><path d="M19.5 3.5v3.7h-3.7" ' + s + '/></svg>';
-  if (kind === "tts") return '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M11 5 6 9H2v6h4l5 4V5Z" ' + s + '/><path d="M15.5 9a3.5 3.5 0 0 1 0 6" ' + s + '/></svg>';
-  if (kind === "trans") return '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M4 5h9M8.5 5V3M6 5c0 5 2.5 8 6 9M11 8c0 4-3.5 6-7 6" ' + s + '/><path d="m13 20 4-9 4 9M14.2 17h5.6" ' + s + '/></svg>';
-  if (kind === "edit") return '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M15.5 5.5l3 3M4 20l1-4L16 5a1.4 1.4 0 0 1 2 0l1 1a1.4 1.4 0 0 1 0 2L8 19l-4 1Z" ' + s + '/></svg>';
-  return '<svg viewBox="0 0 24 24" width="16" height="16"><circle cx="5.5" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="18.5" cy="12" r="1.3" fill="currentColor"/></svg>';
+  const s = 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+  const W = '<svg viewBox="0 0 24 24" width="16" height="16">';
+  if (kind === "copy")  return W + '<rect width="14" height="14" x="8" y="8" rx="2" ry="2" ' + s + '/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" ' + s + '/></svg>';
+  if (kind === "roll")  return W + '<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" ' + s + '/><path d="M21 3v5h-5" ' + s + '/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" ' + s + '/><path d="M8 16H3v5" ' + s + '/></svg>';
+  if (kind === "tts")   return W + '<path d="M11 4.7a.7.7 0 0 0-1.2-.5L6.4 7.6A1.4 1.4 0 0 1 5.4 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.4a1.4 1.4 0 0 1 1 .4l3.4 3.4a.7.7 0 0 0 1.2-.5Z" ' + s + '/><path d="M16 9a5 5 0 0 1 0 6" ' + s + '/><path d="M19.4 5.6a9 9 0 0 1 0 12.7" ' + s + '/></svg>';
+  if (kind === "trans") return W + '<path d="m5 8 6 6" ' + s + '/><path d="m4 14 6-6 2-3" ' + s + '/><path d="M2 5h12" ' + s + '/><path d="M7 2h1" ' + s + '/><path d="m22 22-5-10-5 10" ' + s + '/><path d="M14 18h6" ' + s + '/></svg>';
+  if (kind === "edit")  return W + '<path d="M21.2 6.8a1 1 0 0 0-4-4L3.8 16.2a2 2 0 0 0-.5.8l-1.3 4.4a.5.5 0 0 0 .6.6l4.4-1.3a2 2 0 0 0 .8-.5Z" ' + s + '/><path d="m15 5 4 4" ' + s + '/></svg>';
+  if (kind === "chevron") return W + '<path d="m6 9 6 6 6-6" ' + s + '/></svg>';
+  return W + '<circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="19" cy="12" r="1" fill="currentColor"/><circle cx="5" cy="12" r="1" fill="currentColor"/></svg>';
 }
+
 function buildKvThink(m) {
   const st = state.settings;
   const box = el("div", "kv-think");
   box.style.background = hslaOf(st.thinkHue, st.thinkSat, st.thinkLight, st.thinkAlpha);
-  const ink = st.thinkLight < 45 ? "#e8e8e8" : "#5a5a5a";
+  const ink = st.thinkLight < 45 ? "#e8e8e8" : "#4a4a4a";
   const head = el("div", "kv-think-head"); head.style.color = ink;
-  const arrow = el("span", "kv-think-arrow", "▸");
-  head.appendChild(arrow); head.appendChild(el("span", "", "深度思考"));
+  head.appendChild(el("span", "kv-think-label", "深度思考"));
+  const arrow = el("span", "kv-think-arrow");
+  arrow.innerHTML = kvIcon("chevron");
+  head.appendChild(arrow);
   const bodyd = el("div", "kv-think-body", m.think); bodyd.style.color = ink;
   box.appendChild(head); box.appendChild(bodyd);
-  head.onclick = () => { box.classList.toggle("open"); arrow.textContent = box.classList.contains("open") ? "▾" : "▸"; };
+  head.onclick = () => {
+    box.classList.toggle("open");
+    arrow.style.transform = box.classList.contains("open") ? "rotate(180deg)" : "";
+  };
   return box;
 }
+
 function buildKvBar(m, isUser, gi) {
   const st = state.settings;
   const gv = st.skin === "night" ? Math.min(255, st.metaShade + 60) : st.metaShade;
@@ -1298,20 +1308,19 @@ async function buildKelivoRow(m, gi, aiSrc, userSrc) {
   }
   if (!st.showAvatar) avatar.style.display = "none";
 
-  const nt = el("div", "kv-nt");
+   const nt = el("div", "kv-nt");
   if (st.showName) {
     const nm = el("div", "kv-name", isUser ? r.userName : r.aiName);
-    nm.style.fontFamily = FONT_LIST[st.nameFont];
     nm.style.fontSize = (st.nameSize || 13) + "px";
     nm.style.fontWeight = String(st.nameWeight);
     nt.appendChild(nm);
   }
   if (st.showTime) {
     const tm = el("div", "kv-time", kvTime(m.time));
-    tm.style.fontFamily = FONT_LIST[st.metaFont];
     tm.style.fontSize = (st.metaSize || 11) + "px";
     nt.appendChild(tm);
   }
+
   if (isUser) { head.appendChild(nt); head.appendChild(avatar); }
   else { head.appendChild(avatar); head.appendChild(nt); }
   row.appendChild(head);
