@@ -1197,6 +1197,158 @@ function openSelectCopy(text) {
   mask.appendChild(dlg);
   document.body.appendChild(mask);
 }
+/* ================= Kelivo 独立渲染 ================= */
+function kvTime(ts) {
+  const d = new Date(ts), p = n => String(n).padStart(2, "0");
+  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " +
+         p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
+}
+function kvIcon(kind) {
+  const s = 'fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"';
+  if (kind === "copy") return '<svg viewBox="0 0 24 24" width="16" height="16"><rect x="9" y="9" width="11" height="11" rx="2.5" ' + s + '/><path d="M5 15V6.5A2.5 2.5 0 0 1 7.5 4H16" ' + s + '/></svg>';
+  if (kind === "roll") return '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" ' + s + '/><path d="M19.5 3.5v3.7h-3.7" ' + s + '/></svg>';
+  if (kind === "tts") return '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M11 5 6 9H2v6h4l5 4V5Z" ' + s + '/><path d="M15.5 9a3.5 3.5 0 0 1 0 6" ' + s + '/></svg>';
+  if (kind === "trans") return '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M4 5h9M8.5 5V3M6 5c0 5 2.5 8 6 9M11 8c0 4-3.5 6-7 6" ' + s + '/><path d="m13 20 4-9 4 9M14.2 17h5.6" ' + s + '/></svg>';
+  if (kind === "edit") return '<svg viewBox="0 0 24 24" width="16" height="16"><path d="M15.5 5.5l3 3M4 20l1-4L16 5a1.4 1.4 0 0 1 2 0l1 1a1.4 1.4 0 0 1 0 2L8 19l-4 1Z" ' + s + '/></svg>';
+  return '<svg viewBox="0 0 24 24" width="16" height="16"><circle cx="5.5" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="18.5" cy="12" r="1.3" fill="currentColor"/></svg>';
+}
+function buildKvThink(m) {
+  const st = state.settings;
+  const box = el("div", "kv-think");
+  box.style.background = hslaOf(st.thinkHue, st.thinkSat, st.thinkLight, st.thinkAlpha);
+  const ink = st.thinkLight < 45 ? "#e8e8e8" : "#5a5a5a";
+  const head = el("div", "kv-think-head"); head.style.color = ink;
+  const arrow = el("span", "kv-think-arrow", "▸");
+  head.appendChild(arrow); head.appendChild(el("span", "", "深度思考"));
+  const bodyd = el("div", "kv-think-body", m.think); bodyd.style.color = ink;
+  box.appendChild(head); box.appendChild(bodyd);
+  head.onclick = () => { box.classList.toggle("open"); arrow.textContent = box.classList.contains("open") ? "▾" : "▸"; };
+  return box;
+}
+function buildKvBar(m, isUser, gi) {
+  const st = state.settings;
+  const gv = st.skin === "night" ? Math.min(255, st.metaShade + 60) : st.metaShade;
+  const bar = el("div", "kv-bar" + (isUser ? " kv-bar-user" : ""));
+  bar.style.marginTop = (st.msgBarGap === undefined ? 8 : st.msgBarGap) + "px";
+  bar.style.color = "rgb(" + gv + "," + gv + "," + gv + ")";
+  const mk = (kind, fn) => {
+    const b = el("span", "kv-bar-btn"); b.innerHTML = kvIcon(kind);
+    b.onclick = (e) => { e.stopPropagation(); if (streaming) { toast("等他说完"); return; } fn(e); };
+    bar.appendChild(b);
+  };
+  mk("copy", () => copyText(msgText(m)));
+  if (!isUser) mk("roll", () => regenerate(m));
+  if (isUser) mk("edit", () => inputDialog("编辑消息", msgText(m), v => { if (v.trim()) { m.versions[m.vi] = v; saveState(); renderMessages(); } }, true));
+  if (!isUser) { mk("tts", () => toast("朗读需配置语音服务")); mk("trans", () => toast("翻译需配置服务")); }
+  mk("more", (e) => {
+    const items = [
+      { label: "选择复制", fn: () => openSelectCopy(msgText(m)) },
+      { label: "编辑消息", fn: () => inputDialog("编辑消息", msgText(m), v => { if (v.trim()) { m.versions[m.vi] = v; saveState(); renderMessages(); } }, true) },
+      { label: "多条删除", fn: () => enterMultiMode(m.id) }
+    ];
+    if (m.img || (m.imgs && m.imgs.length)) items.push({ label: "删除图片", danger: true, fn: () => confirmDialog("删除这条的图片？", () => { delete m.img; delete m.imgs; saveState(); renderMessages(); }) });
+    items.push({ label: "删除", danger: true, fn: () => confirmDialog("删除这条消息？", () => { const s = curSession(); s.messages = s.messages.filter(x => x.id !== m.id); saveState(); renderMessages(); }) });
+    showActions(items, 0, 0);
+    const mn = document.querySelector(".msg-actions");
+    if (mn) {
+      const br = e.currentTarget.getBoundingClientRect(), mw = mn.offsetWidth, mh = mn.offsetHeight, gap = 8;
+      let left = isUser ? (br.right - mw) : br.left;
+      left = Math.max(gap, Math.min(left, window.innerWidth - mw - gap));
+      let top = br.bottom + 6;
+      if (top + mh > window.innerHeight - gap) top = br.top - mh - 6;
+      top = Math.max(gap, Math.min(top, window.innerHeight - mh - gap));
+      mn.style.left = left + "px"; mn.style.top = top + "px";
+    }
+  });
+  if (!isUser && m.versions.length > 1) {
+    const vs = el("span", "kv-vs");
+    const pv = el("button", "kv-vs-btn", "‹"), lb = el("span", "kv-vs-lab", (m.vi + 1) + "/" + m.versions.length), nx = el("button", "kv-vs-btn", "›");
+    pv.onclick = (e) => { e.stopPropagation(); m.vi = Math.max(0, m.vi - 1); saveState(); renderMessages(); };
+    nx.onclick = (e) => { e.stopPropagation(); m.vi = Math.min(m.versions.length - 1, m.vi + 1); saveState(); renderMessages(); };
+    vs.appendChild(pv); vs.appendChild(lb); vs.appendChild(nx); bar.appendChild(vs);
+  }
+  if (!isUser && st.showToken && m.tokens) bar.appendChild(el("span", "kv-token", m.tokens + " tokens"));
+  return bar;
+}
+async function buildKelivoRow(m, gi, aiSrc, userSrc) {
+  if (m.role === "err") return buildErrRow(m);
+  const st = state.settings, isUser = m.role === "user", r = curRole();
+  const row = document.createElement("div");
+  row.className = "kv-row " + (isUser ? "kv-user" : "kv-ai");
+  row.dataset.id = m.id;
+
+  const check = document.createElement("input");
+  check.type = "checkbox"; check.className = "msg-check"; check.dataset.id = m.id;
+  row.appendChild(check);
+
+  const head = el("div", "kv-head");
+  // 头像：AI 默认用模型图标(切模型自动变)，角色上传了自定义就用自定义；用户用自定义/兜底
+  let avatar;
+  if (!isUser && aiSrc === AI_FALLBACK) {
+    avatar = makeModelIcon(curProvider().model || "", st.avatarSize);
+    avatar.classList.add("kv-avatar");
+    avatar.style.background = "transparent";
+  } else {
+    avatar = document.createElement("img");
+    avatar.className = "kv-avatar";
+    avatar.src = isUser ? userSrc : aiSrc;
+    avatar.style.width = st.avatarSize + "px";
+    avatar.style.height = st.avatarSize + "px";
+    avatar.style.borderRadius = st.avatarShape === "square" ? "8px" : "50%";
+  }
+  if (!st.showAvatar) avatar.style.display = "none";
+
+  const nt = el("div", "kv-nt");
+  if (st.showName) {
+    const nm = el("div", "kv-name", isUser ? r.userName : r.aiName);
+    nm.style.fontFamily = FONT_LIST[st.nameFont];
+    nm.style.fontSize = (st.nameSize || 13) + "px";
+    nm.style.fontWeight = String(st.nameWeight);
+    nt.appendChild(nm);
+  }
+  if (st.showTime) {
+    const tm = el("div", "kv-time", kvTime(m.time));
+    tm.style.fontFamily = FONT_LIST[st.metaFont];
+    tm.style.fontSize = (st.metaSize || 11) + "px";
+    nt.appendChild(tm);
+  }
+  if (isUser) { head.appendChild(nt); head.appendChild(avatar); }
+  else { head.appendChild(avatar); head.appendChild(nt); }
+  row.appendChild(head);
+
+  const col = el("div", "kv-col");
+  col.style.marginTop = (st.metaGap === undefined ? 6 : st.metaGap) + "px";
+  if (!isUser && m.think && st.thinkOn && st.thinkMode === "fold") col.appendChild(buildKvThink(m));
+
+  const bubble = el("div", "msg-bubble kv-bubble " + (isUser ? "kv-bubble-user" : "kv-bubble-ai"));
+  (m.imgs || (m.img ? [m.img] : [])).forEach(src => { const im = el("img", "kv-img"); im.src = src; bubble.appendChild(im); });
+  const txt = el("span", "msg-txt");
+  setMsgHtml(txt, msgText(m));
+  bubble.appendChild(txt);
+  if (isUser) {
+    bubble.style.borderRadius = st.bubbleRadius + "px";
+    bubble.style.padding = st.bubblePadV + "px " + st.bubblePadH + "px";
+    bubble.style.maxWidth = st.bubbleMaxW + "%";
+    const c = bubbleColorOf(true);
+    bubble.style.background = c ? c.bg : "color-mix(in srgb, var(--kv-primary,#4D5C92) 8%, transparent)";
+    if (c && c.dark) bubble.style.color = "#f2f2f2";
+  } else {
+    const c = bubbleColorOf(false);
+    if (c) {
+      bubble.style.background = c.bg;
+      bubble.style.borderRadius = st.bubbleRadius + "px";
+      bubble.style.padding = st.bubblePadV + "px " + st.bubblePadH + "px";
+      bubble.style.maxWidth = "100%";
+      if (c.dark) bubble.style.color = "#f2f2f2";
+    } else {
+      bubble.style.background = "none"; bubble.style.padding = "0"; bubble.style.maxWidth = "100%";
+    }
+  }
+  col.appendChild(bubble);
+  if (st.msgBarOn && (!gi.inGroup || gi.isLast)) col.appendChild(buildKvBar(m, isUser, gi));
+  row.appendChild(col);
+  return row;
+}
 
 /* ---------- 单行装配 ---------- */
 async function buildMsgRow(m, gi, aiSrc, userSrc) {
@@ -1435,7 +1587,9 @@ async function renderMessages(keepScroll) {
   const frag = document.createDocumentFragment();
   for (let i = 0; i < s.messages.length; i++) {
     const gi = groupInfo(s.messages, i);
-    const row = await buildMsgRow(s.messages[i], gi, aiSrc, userSrc);
+        const row = state.settings.chatUi === "kelivo"
+      ? await buildKelivoRow(s.messages[i], gi, aiSrc, userSrc)
+      : await buildMsgRow(s.messages[i], gi, aiSrc, userSrc);
     frag.appendChild(row);
   }
   area.innerHTML = "";
@@ -1461,7 +1615,9 @@ async function appendMessage(m) {
   const userSrc = await avatarSrc("user");
   const i = s.messages.indexOf(m);
   const gi = i >= 0 ? groupInfo(s.messages, i) : { inGroup: false, isFirst: true, isLast: true };
-  const row = await buildMsgRow(m, gi, aiSrc, userSrc);
+    const row = state.settings.chatUi === "kelivo"
+    ? await buildKelivoRow(m, gi, aiSrc, userSrc)
+    : await buildMsgRow(m, gi, aiSrc, userSrc);
   row.classList.add("anim-in");
   area.appendChild(row);
   area.scrollTop = area.scrollHeight;
@@ -1937,7 +2093,7 @@ async function runStream(aiMsg, messages, isRegen) {
   let row;
   if (isRegen) {
     await renderMessages();
-    row = document.querySelector('.msg-row[data-id="' + aiMsg.id + '"]');
+    row = document.querySelector('[data-id="' + aiMsg.id + '"]');
   } else {
     row = await appendMessage(aiMsg);
   }
