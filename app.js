@@ -778,9 +778,10 @@ function sendGlyphHtml() {
 /* ---------- Kelivo 整套排版：写进你原生 settings，1:1 原值，套完仍可用滑块调 ---------- */
 const KV_KEYS = ["avatarShape","avatarSize","showAvatar","showName","showTime",
   "nameSize","nameWeight","timeFmt","timeAt","metaSize","metaShade",
-  "bubbleAlign","nameMid","msgGap","metaGap","avBubbleGap","msgBarGap",
+  "bubbleAlign","nameMid","msgGap","metaGap","avBubbleGap","msgBarGap","splitGap",
   "aiBare","bubbleShape","bubbleRadius","bubblePadV","bubblePadH","bubbleMaxW",
-  "bubbleTexture","bubbleGlow","userHue","userSat","userLight","userAlpha","aiHue",
+  "bubbleTexture","bubbleGlow","userHue","userSat","userLight","userAlpha",
+  "aiHue","aiSat","aiLight","aiAlpha","topbarAlpha",
   "fontSize","chatWeight","chatLineH","paraGap","msgBarOn","showToken","tokenInBar"];
 function snapshotKvLayout() { const o = {}; KV_KEYS.forEach(k => o[k] = state.settings[k]); return o; }
 function restoreKvLayout(bk) { if (!bk) return; KV_KEYS.forEach(k => { if (bk[k] !== undefined) state.settings[k] = bk[k]; }); }
@@ -796,25 +797,42 @@ function applyKelivoLayout() {
   st.bubbleShape = "round-lg"; st.bubbleRadius = 16;
   st.bubblePadV = 12; st.bubblePadH = 12; st.bubbleMaxW = 75;
   st.bubbleTexture = "plain"; st.bubbleGlow = 0;
-  st.userHue = 225; st.userSat = 28; st.userLight = 93; st.userAlpha = 100;
-  st.aiHue = -1;
+  st.userHue = -1; st.aiHue = -1;
   st.fontSize = 15.7; st.chatWeight = 400; st.chatLineH = 1.5; st.paraGap = 8;
   st.msgBarOn = true; st.showToken = true; st.tokenInBar = true;
+  st.topbarAlpha = 100;
   saveState();
 }
-
+let _kvOrigMenu = null, _kvOrigNew = null;
 function paintTopbarTitle() {
   const tt = $("#topbar-title");
   if (!tt) return;
-  if (state.settings.chatUi === "kelivo") {
+  const isKv = state.settings.chatUi === "kelivo";
+  const menuBtn = $("#menu-btn"), newBtn = $("#new-session-btn");
+  if (menuBtn && _kvOrigMenu === null) _kvOrigMenu = menuBtn.innerHTML;
+  if (newBtn && _kvOrigNew === null) _kvOrigNew = newBtn.innerHTML;
+  let mapBtn = document.getElementById("kv-map-btn");
+  if (isKv) {
+    if (menuBtn) menuBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
+    if (newBtn) newBtn.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/><path d="M12 8v6M9 11h6"/></svg>';
+    if (newBtn && !mapBtn) {
+      mapBtn = el("button", "topbar-btn"); mapBtn.id = "kv-map-btn";
+      mapBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.1 5.5a2 2 0 0 0 1.8 0l3.6-1.8A1 1 0 0 1 21 4.6v12.8a1 1 0 0 1-.6.9l-4.5 2.3a2 2 0 0 1-1.8 0l-4.2-2.1a2 2 0 0 0-1.8 0l-3.6 1.8A1 1 0 0 1 3 19.4V6.6a1 1 0 0 1 .6-.9l4.5-2.3a2 2 0 0 1 1.8 0z"/><path d="M15 5.8v15M9 3.2v15"/></svg>';
+      mapBtn.onclick = () => toast("小地图");
+      newBtn.parentNode.insertBefore(mapBtn, newBtn);
+    }
+    if (mapBtn) mapBtn.style.display = "";
     tt.innerHTML = "";
     const t1 = el("div", "", curSession().name);
-    t1.style.cssText = "line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
+    t1.style.cssText = "line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px;font-weight:500;";
     const p = curProvider();
     const t2 = el("div", "", (p.model || "") + (p.name ? " (" + p.name + ")" : ""));
-    t2.style.cssText = "font-size:11px;font-weight:400;line-height:1.15;margin-top:2px;color:color-mix(in srgb,var(--text-main) 55%,transparent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
+    t2.style.cssText = "font-size:11px;font-weight:500;line-height:1.15;margin-top:2px;color:color-mix(in srgb,var(--text-main) 60%,transparent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
     tt.appendChild(t1); tt.appendChild(t2);
   } else {
+    if (menuBtn && _kvOrigMenu !== null) menuBtn.innerHTML = _kvOrigMenu;
+    if (newBtn && _kvOrigNew !== null) newBtn.innerHTML = _kvOrigNew;
+    if (mapBtn) mapBtn.style.display = "none";
     tt.textContent = curSession().name;
   }
 }
@@ -1213,9 +1231,11 @@ function kvIcon(kind) {
   if (kind === "trans") return W + '<path d="m5 8 6 6" ' + s + '/><path d="m4 14 6-6 2-3" ' + s + '/><path d="M2 5h12" ' + s + '/><path d="M7 2h1" ' + s + '/><path d="m22 22-5-10-5 10" ' + s + '/><path d="M14 18h6" ' + s + '/></svg>';
   if (kind === "edit")  return W + '<path d="M21.2 6.8a1 1 0 0 0-4-4L3.8 16.2a2 2 0 0 0-.5.8l-1.3 4.4a.5.5 0 0 0 .6.6l4.4-1.3a2 2 0 0 0 .8-.5Z" ' + s + '/><path d="m15 5 4 4" ' + s + '/></svg>';
   if (kind === "chevron") return W + '<path d="m6 9 6 6 6-6" ' + s + '/></svg>';
-  return W + '<circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="19" cy="12" r="1" fill="currentColor"/><circle cx="5" cy="12" r="1" fill="currentColor"/></svg>';
+  if (kind === "vsleft")  return W + '<path d="m15 18-6-6 6-6" ' + s + '/></svg>';
+  if (kind === "vsright") return W + '<path d="m9 18 6-6-6-6" ' + s + '/></svg>';
+  if (kind === "brain")   return '<svg viewBox="0 0 24 24" width="18" height="18"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.8.8 1.3 1.5 1.5 2.5" ' + s + '/><path d="M9 18h6" ' + s + '/><path d="M10 22h4" ' + s + '/></svg>';
+  return W + '<circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/><circle cx="5" cy="12" r="1.4" fill="currentColor"/></svg>';
 }
-
 function buildKvThink(m) {
   const st = state.settings;
   const box = el("div", "kv-think");
@@ -1223,18 +1243,40 @@ function buildKvThink(m) {
   const ink = st.thinkLight < 45 ? "#e8e8e8" : "#4a4a4a";
   const head = el("div", "kv-think-head"); head.style.color = ink;
   head.appendChild(el("span", "kv-think-label", "深度思考"));
+  if (m.thinkStart && m.thinkEnd && m.thinkEnd > m.thinkStart) {
+    head.appendChild(el("span", "kv-think-dur", "(" + ((m.thinkEnd - m.thinkStart) / 1000).toFixed(1) + "s)"));
+  }
   const arrow = el("span", "kv-think-arrow");
   arrow.innerHTML = kvIcon("chevron");
   head.appendChild(arrow);
+  const step = el("div", "kv-think-step");
+  const rail = el("div", "kv-think-rail");
+  const sicon = el("span", "kv-think-stepicon"); sicon.innerHTML = kvIcon("brain");
+  const line = el("div", "kv-think-line");
+  rail.appendChild(sicon); rail.appendChild(line);
+  const wrap = el("div", "kv-think-bodywrap");
   const bodyd = el("div", "kv-think-body", m.think); bodyd.style.color = ink;
-  box.appendChild(head); box.appendChild(bodyd);
+  wrap.appendChild(bodyd);
+  step.appendChild(rail); step.appendChild(wrap);
+  box.appendChild(head); box.appendChild(step);
   head.onclick = () => {
     box.classList.toggle("open");
     arrow.style.transform = box.classList.contains("open") ? "rotate(180deg)" : "";
   };
   return box;
 }
-
+function resendUser(userMsg) {
+  if (streaming) return;
+  const s = curSession();
+  const idx = s.messages.indexOf(userMsg);
+  if (idx < 0) return;
+  const next = s.messages[idx + 1];
+  if (next && next.role === "ai") { regenerate(next); return; }
+  const aiMsg = { id: uid(), role: "ai", versions: [""], vi: 0, time: Date.now(), tokens: null };
+  s.messages.splice(idx + 1, 0, aiMsg);
+  saveState();
+  runStream(aiMsg, buildMessages(aiMsg.id));
+}
 function buildKvBar(m, isUser, gi) {
   const st = state.settings;
   const gv = st.skin === "night" ? Math.min(255, st.metaShade + 60) : st.metaShade;
@@ -1248,7 +1290,8 @@ function buildKvBar(m, isUser, gi) {
   };
   mk("copy", () => copyText(msgText(m)));
   if (!isUser) mk("roll", () => regenerate(m));
-  if (isUser) mk("edit", () => inputDialog("编辑消息", msgText(m), v => { if (v.trim()) { m.versions[m.vi] = v; saveState(); renderMessages(); } }, true));
+  if (isUser)  mk("roll", () => resendUser(m));
+  if (isUser)  mk("edit", () => inputDialog("编辑消息", msgText(m), v => { if (v.trim()) { m.versions[m.vi] = v; saveState(); renderMessages(); } }, true));
   if (!isUser) { mk("tts", () => toast("朗读需配置语音服务")); mk("trans", () => toast("翻译需配置服务")); }
   mk("more", (e) => {
     const items = [
@@ -1272,12 +1315,18 @@ function buildKvBar(m, isUser, gi) {
   });
   if (!isUser && m.versions.length > 1) {
     const vs = el("span", "kv-vs");
-    const pv = el("button", "kv-vs-btn", "‹"), lb = el("span", "kv-vs-lab", (m.vi + 1) + "/" + m.versions.length), nx = el("button", "kv-vs-btn", "›");
+    const pv = el("button", "kv-vs-btn"); pv.innerHTML = kvIcon("vsleft");
+    const lb = el("span", "kv-vs-lab", (m.vi + 1) + "/" + m.versions.length);
+    const nx = el("button", "kv-vs-btn"); nx.innerHTML = kvIcon("vsright");
     pv.onclick = (e) => { e.stopPropagation(); m.vi = Math.max(0, m.vi - 1); saveState(); renderMessages(); };
     nx.onclick = (e) => { e.stopPropagation(); m.vi = Math.min(m.versions.length - 1, m.vi + 1); saveState(); renderMessages(); };
     vs.appendChild(pv); vs.appendChild(lb); vs.appendChild(nx); bar.appendChild(vs);
   }
-  if (!isUser && st.showToken && m.tokens) bar.appendChild(el("span", "kv-token", m.tokens + " tokens"));
+  if (!isUser && st.showToken && m.tokens) {
+    const tk = el("span", "kv-token", m.tokens + " tokens");
+    tk.style.fontSize = (st.metaSize || 11) + "px";
+    bar.appendChild(tk);
+  }
   return bar;
 }
 async function buildKelivoRow(m, gi, aiSrc, userSrc) {
@@ -1292,7 +1341,6 @@ async function buildKelivoRow(m, gi, aiSrc, userSrc) {
   row.appendChild(check);
 
   const head = el("div", "kv-head");
-  // 头像：AI 默认用模型图标(切模型自动变)，角色上传了自定义就用自定义；用户用自定义/兜底
   let avatar;
   if (!isUser && aiSrc === AI_FALLBACK) {
     avatar = makeModelIcon(curProvider().model || "", st.avatarSize);
@@ -1308,7 +1356,7 @@ async function buildKelivoRow(m, gi, aiSrc, userSrc) {
   }
   if (!st.showAvatar) avatar.style.display = "none";
 
-   const nt = el("div", "kv-nt");
+  const nt = el("div", "kv-nt");
   if (st.showName) {
     const nm = el("div", "kv-name", isUser ? r.userName : r.aiName);
     nm.style.fontSize = (st.nameSize || 13) + "px";
@@ -1320,13 +1368,12 @@ async function buildKelivoRow(m, gi, aiSrc, userSrc) {
     tm.style.fontSize = (st.metaSize || 11) + "px";
     nt.appendChild(tm);
   }
-
   if (isUser) { head.appendChild(nt); head.appendChild(avatar); }
   else { head.appendChild(avatar); head.appendChild(nt); }
   row.appendChild(head);
 
   const col = el("div", "kv-col");
-  col.style.marginTop = (st.metaGap === undefined ? 6 : st.metaGap) + "px";
+  col.style.marginTop = (st.metaGap === undefined ? 8 : st.metaGap) + "px";
   if (!isUser && m.think && st.thinkOn && st.thinkMode === "fold") col.appendChild(buildKvThink(m));
 
   const bubble = el("div", "msg-bubble kv-bubble " + (isUser ? "kv-bubble-user" : "kv-bubble-ai"));
@@ -1338,19 +1385,21 @@ async function buildKelivoRow(m, gi, aiSrc, userSrc) {
     bubble.style.borderRadius = st.bubbleRadius + "px";
     bubble.style.padding = st.bubblePadV + "px " + st.bubblePadH + "px";
     bubble.style.maxWidth = st.bubbleMaxW + "%";
+    bubble.style.lineHeight = "1.4";
+    txt.style.fontSize = "15.5px";
     const c = bubbleColorOf(true);
-    bubble.style.background = c ? c.bg : "color-mix(in srgb, var(--kv-primary,#4D5C92) 8%, transparent)";
-    if (c && c.dark) bubble.style.color = "#f2f2f2";
+    if (c) { bubble.style.background = c.bg; if (c.dark) bubble.style.color = "#f2f2f2"; }
   } else {
-    const c = bubbleColorOf(false);
-    if (c) {
-      bubble.style.background = c.bg;
+    if (st.aiBare) {
+      bubble.style.background = "none"; bubble.style.padding = "0"; bubble.style.maxWidth = "100%";
+    } else {
+      const c = bubbleColorOf(false);
+      bubble.style.width = "fit-content";
       bubble.style.borderRadius = st.bubbleRadius + "px";
       bubble.style.padding = st.bubblePadV + "px " + st.bubblePadH + "px";
-      bubble.style.maxWidth = "100%";
-      if (c.dark) bubble.style.color = "#f2f2f2";
-    } else {
-      bubble.style.background = "none"; bubble.style.padding = "0"; bubble.style.maxWidth = "100%";
+      bubble.style.maxWidth = st.bubbleMaxW + "%";
+      bubble.style.background = c ? c.bg : "color-mix(in srgb,var(--kv-secondary) 12%,transparent)";
+      if (c && c.dark) bubble.style.color = "#f2f2f2";
     }
   }
   col.appendChild(bubble);
@@ -2122,7 +2171,9 @@ async function runStream(aiMsg, messages, isRegen) {
         if (stick) area.scrollTop = area.scrollHeight;
       }
     }, (thinkChunk) => {
+      if (!aiMsg.thinkStart) aiMsg.thinkStart = Date.now();
       aiMsg.think = (aiMsg.think || "") + thinkChunk;
+      aiMsg.thinkEnd = Date.now();
     });
     if (usage) aiMsg.tokens = usage;
 
@@ -3531,15 +3582,23 @@ function buildTabLook(body) {
   );
   mkSlider(sec, "主题润度", 0, 100, 1, "skinGlow", "", applyTheme);
   mkSlider(sec, "全局降亮（觉得刺眼往右拉）", 0, 30, 1, "globalDim", "%", applyTheme);
-    mkPickRow(sec, "聊天界面",
+  mkPickRow(sec, "聊天界面",
     [{ v: "home", name: "经典" }, { v: "gpt", name: "简约" }, { v: "kelivo", name: "Kelivo" }],
     () => state.settings.chatUi,
     (v) => {
       const prev = state.settings.chatUi;
-      if (v === "kelivo" && prev !== "kelivo") state.settings._kvBackup = snapshotKvLayout();
-      if (v !== "kelivo" && prev === "kelivo") { restoreKvLayout(state.settings._kvBackup); state.settings._kvBackup = null; }
+      if (v === prev) return;
+      if (prev === "kelivo") {
+        state.settings._kvSaved = snapshotKvLayout();
+        restoreKvLayout(state.settings._homeBackup);
+        state.settings._homeBackup = null;
+      }
+      if (v === "kelivo") {
+        state.settings._homeBackup = snapshotKvLayout();
+        if (state.settings._kvSaved) restoreKvLayout(state.settings._kvSaved);
+        else applyKelivoLayout();
+      }
       state.settings.chatUi = v;
-      if (v === "kelivo") applyKelivoLayout();
       saveState();
       applyTheme();
       applyChatTypo();
