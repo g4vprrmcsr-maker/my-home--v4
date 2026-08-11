@@ -1705,8 +1705,8 @@ body.skin-kelivo #topbar-title > *{ max-width:100%; overflow:hidden; text-overfl
 
 /* 输入框：保持你当前要的效果，不动 */
 body.skin-kelivo #input-area{ padding-left:12px; padding-right:12px; }
-body.skin-kelivo.skin-kelivo.skin-kelivo #input-box{ border-radius:20px; border:1px solid rgba(0,0,0,.14); box-shadow:none; backdrop-filter:blur(14px) saturate(1.4); -webkit-backdrop-filter:blur(14px) saturate(1.4); background:color-mix(in srgb,var(--kv-primary) 3%, rgba(255,255,255,.55)); padding:10px 12px 8px; }
-body.skin-kelivo.dark.skin-kelivo.skin-kelivo #input-box{ background:color-mix(in srgb,var(--text-main) 7%, rgba(40,40,44,.55)); border-color:rgba(255,255,255,.10); }
+body.skin-kelivo.skin-kelivo.skin-kelivo #input-box{ border-radius:20px; border:1px solid rgba(0,0,0,.14); box-shadow:none; backdrop-filter:blur(14px) saturate(1.4); -webkit-backdrop-filter:blur(14px) saturate(1.4); background:rgba(255,255,255,.92); padding:10px 12px 8px; }
+body.skin-kelivo.dark.skin-kelivo.skin-kelivo #input-box{ background:rgba(40,40,44,.92); border-color:rgba(255,255,255,.10); }
 body.skin-kelivo.skin-kelivo.skin-kelivo #input-text{ min-height:42px; font-size:15px; background:transparent; }
 body.skin-kelivo #model-btn{ color:var(--kv-primary); background:none; }
 body.skin-kelivo.skin-kelivo.skin-kelivo #send-btn{ width:32px; height:32px; border-radius:50%; padding:7px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; background:var(--kv-primary); color:var(--kv-on); font-size:18px; line-height:1; }
