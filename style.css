@@ -1696,19 +1696,17 @@ body.dark.gpt-ui #send-btn { background: #eaeaea; color: #111; }
 body.skin-kelivo{ --kv-primary:#4D5C92; --kv-on:#fff; --kv-secondary:#5A5D72; }
 body.skin-kelivo.dark{ --kv-primary:#B6C4FF; --kv-on:#1D2D61; --kv-secondary:#C3C5DD; }
 
-/* 顶栏：不透 surface 底 + 柔和分界线（非全透明），titleSpacing 2，标题不左裁 */
-body.skin-kelivo.skin-kelivo.skin-kelivo #topbar{ gap:0; background:var(--bg); border-bottom:1px solid var(--line); box-shadow:none; }
+/* 顶栏：透明底 + 背景色渐变遮罩（顶实→下透），内容滑到顶自然淡出，不透字不描边 */
+body.skin-kelivo.skin-kelivo.skin-kelivo #topbar{ gap:0; padding-left:8px; padding-right:8px; background:linear-gradient(to bottom, var(--bg) 42%, color-mix(in srgb,var(--bg) 55%,transparent) 74%, transparent 100%); border:none; box-shadow:none; }
 body.skin-kelivo.skin-kelivo.skin-kelivo #topbar .topbar-btn{ background:none; box-shadow:none; border:none; backdrop-filter:none; -webkit-backdrop-filter:none; color:var(--text-main); flex-shrink:0; }
 body.skin-kelivo.skin-kelivo.skin-kelivo #topbar .topbar-btn:last-child{ margin-left:0; margin-right:4px; }
-body.skin-kelivo.skin-kelivo.skin-kelivo #topbar-title{ flex:1 1 0; min-width:0; overflow:hidden; background:none; box-shadow:none; border:none; backdrop-filter:none; -webkit-backdrop-filter:none; padding:0; margin-left:2px; display:flex; flex-direction:column; justify-content:center; }
-body.skin-kelivo #topbar-title > div{ max-width:100%; text-align:left; }
+body.skin-kelivo.skin-kelivo.skin-kelivo #topbar-title{ flex:1 1 0; min-width:0; overflow:hidden; align-items:flex-start; background:none; box-shadow:none; border:none; backdrop-filter:none; -webkit-backdrop-filter:none; padding:0; margin-left:2px; display:flex; flex-direction:column; justify-content:center; }
 
-/* 输入框：磨砂 blur14 + 极淡叠色（源值），文本区左内距16、占位不居中 */
-body.skin-kelivo #input-area{ padding:4px 12px 8px; }
-body.skin-kelivo.skin-kelivo.skin-kelivo #input-box{ border-radius:20px; border:1px solid rgba(0,0,0,.14); box-shadow:none; backdrop-filter:blur(14px) saturate(1.4); -webkit-backdrop-filter:blur(14px) saturate(1.4); background:color-mix(in srgb,var(--kv-primary) 3%, rgba(255,255,255,.55)); padding:4px 0 8px; }
+/* 输入框：还原原始尺寸（min-height42 / padding 10-12-8），只换成磨砂色 */
+body.skin-kelivo #input-area{ padding-left:12px; padding-right:12px; }
+body.skin-kelivo.skin-kelivo.skin-kelivo #input-box{ border-radius:20px; border:1px solid rgba(0,0,0,.14); box-shadow:none; backdrop-filter:blur(14px) saturate(1.4); -webkit-backdrop-filter:blur(14px) saturate(1.4); background:color-mix(in srgb,var(--kv-primary) 3%, rgba(255,255,255,.55)); padding:10px 12px 8px; }
 body.skin-kelivo.dark.skin-kelivo.skin-kelivo #input-box{ background:color-mix(in srgb,var(--text-main) 7%, rgba(40,40,44,.55)); border-color:rgba(255,255,255,.10); }
-body.skin-kelivo.skin-kelivo.skin-kelivo #input-text{ min-height:40px; font-size:15px; padding:4px 16px; background:transparent; }
-body.skin-kelivo .input-toolbar{ padding:0 8px; }
+body.skin-kelivo.skin-kelivo.skin-kelivo #input-text{ min-height:42px; font-size:15px; background:transparent; }
 body.skin-kelivo #model-btn{ color:var(--kv-primary); background:none; }
 body.skin-kelivo.skin-kelivo.skin-kelivo #send-btn{ width:32px; height:32px; border-radius:50%; padding:7px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; background:var(--kv-primary); color:var(--kv-on); font-size:18px; line-height:1; }
 body.skin-kelivo.skin-kelivo.skin-kelivo #send-btn svg{ width:18px; height:18px; display:block; }
@@ -1740,13 +1738,13 @@ body.skin-kelivo .kv-bubble-user{ background:color-mix(in srgb,var(--kv-primary)
 body.skin-kelivo.dark .kv-bubble-user{ background:color-mix(in srgb,var(--kv-primary) 15%,transparent); }
 body.skin-kelivo .kv-img{ max-width:200px; max-height:260px; border-radius:12px; margin-bottom:6px; display:block; }
 
-/* 思维链：源值 卡 padding 4/8、label 13、正文 12.5/1.32 不加粗，默认折叠 */
+/* 思维链：卡 4/8，标题13/400，正文12/300 */
 body.skin-kelivo .kv-think{ border-radius:16px; padding:4px 8px; margin-bottom:8px; width:100%; box-sizing:border-box; }
 body.skin-kelivo .kv-think-head{ display:flex; align-items:center; gap:8px; padding:8px 4px; cursor:pointer; }
 body.skin-kelivo .kv-think-bulb{ width:18px; height:18px; display:inline-flex; opacity:.85; flex-shrink:0; }
-body.skin-kelivo .kv-think-label{ font-size:13px; font-weight:500; }
+body.skin-kelivo .kv-think .kv-think-label{ font-size:13px; font-weight:400; }
 body.skin-kelivo .kv-think-arrow{ margin-left:auto; display:inline-flex; opacity:.55; transition:transform .2s; }
-body.skin-kelivo .kv-think-body{ display:none; font-size:12.5px; font-weight:400; line-height:1.32; padding:2px 4px 6px; white-space:pre-wrap; word-break:break-word; }
+body.skin-kelivo .kv-think .kv-think-body{ display:none; font-size:12px; font-weight:300; line-height:1.32; padding:2px 4px 6px; white-space:pre-wrap; word-break:break-word; }
 body.skin-kelivo .kv-think.open .kv-think-body{ display:block; }
 
 body.skin-kelivo .kv-bar{ display:flex; align-items:center; gap:6px; }
