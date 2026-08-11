@@ -830,11 +830,12 @@ function paintTopbarTitle() {
     }
     if (mapBtn) mapBtn.style.display = "";
     tt.innerHTML = "";
+    const clip = "display:block;width:100%;max-width:100%;box-sizing:border-box;text-align:left;direction:ltr;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
     const t1 = el("div", "", curSession().name);
-    t1.style.cssText = "line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px;font-weight:500;";
+    t1.style.cssText = clip + "line-height:1.2;font-size:16px;font-weight:500;";
     const p = curProvider();
     const t2 = el("div", "", (p.model || "") + (p.name ? " (" + p.name + ")" : ""));
-    t2.style.cssText = "font-size:11px;font-weight:500;line-height:1.2;margin-top:2px;color:color-mix(in srgb,var(--text-main) 60%,transparent);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
+    t2.style.cssText = clip + "font-size:11px;font-weight:500;line-height:1.2;margin-top:2px;color:color-mix(in srgb,var(--text-main) 60%,transparent);";
     tt.appendChild(t1); tt.appendChild(t2);
     const itx = $("#input-text");
     if (itx && !itx._kvSendBound) { itx._kvSendBound = true; itx.addEventListener("input", updateKvSend); }
