@@ -1244,7 +1244,7 @@ function kvIcon(kind) {
   if (kind === "chevron") return W + '<path d="m6 9 6 6 6-6" ' + s + '/></svg>';
   if (kind === "vsleft")  return W + '<path d="m15 18-6-6 6-6" ' + s + '/></svg>';
   if (kind === "vsright") return W + '<path d="m9 18 6-6-6-6" ' + s + '/></svg>';
-  if (kind === "stop")    return W + '<rect x="6" y="6" width="12" height="12" rx="3" fill="currentColor" stroke="none"/></svg>';
+  if (kind === "stop")    return W + '<rect x="4" y="4" width="16" height="16" rx="4" fill="currentColor" stroke="none"/></svg>';
   if (kind === "bulb")    return '<svg viewBox="0 0 24 24" width="17" height="17"><path d="M9 18h6" ' + s + '/><path d="M10 22h4" ' + s + '/><path d="M15.1 14c.2-1 .6-1.7 1.4-2.5A4.6 4.6 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.8.8 1.2 1.5 1.4 2.5" ' + s + '/></svg>';
   return W + '<circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/><circle cx="5" cy="12" r="2" fill="currentColor"/></svg>';
 }
