@@ -820,7 +820,7 @@ function paintTopbarTitle() {
   if (newBtn && _kvOrigNew === null) _kvOrigNew = newBtn.innerHTML;
   let mapBtn = document.getElementById("kv-map-btn");
   if (isKv) {
-    if (menuBtn) menuBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/></svg>';
+    if (menuBtn) menuBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 7 Q11 6.4 15 7"/><path d="M4 12 Q12 11.35 20 12"/><path d="M7 17 Q11.5 16.5 15.5 17"/></svg>';
     if (newBtn) newBtn.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>';
     if (newBtn && !mapBtn) {
       mapBtn = el("button", "topbar-btn"); mapBtn.id = "kv-map-btn";
@@ -832,11 +832,21 @@ function paintTopbarTitle() {
     tt.innerHTML = "";
     const clip = "display:block;width:100%;max-width:100%;box-sizing:border-box;text-align:left;direction:ltr;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
     const t1 = el("div", "", curSession().name);
-    t1.style.cssText = clip + "line-height:1.2;font-size:var(--title-fs,16px);font-weight:var(--title-fw,500);";
+    t1.style.cssText = clip + "line-height:1.2;font-size:16px;font-weight:500;";
     const p = curProvider();
     const t2 = el("div", "", (p.model || "") + (p.name ? " (" + p.name + ")" : ""));
     t2.style.cssText = clip + "font-size:11px;font-weight:500;line-height:1.2;margin-top:2px;color:color-mix(in srgb,var(--text-main) 60%,transparent);";
     tt.appendChild(t1); tt.appendChild(t2);
+    const kvMb = $("#model-btn");
+    if (kvMb) {
+      kvMb.innerHTML = "";
+      const kvIc = makeModelIcon(curProvider().model || "", 26);
+      kvIc.style.margin = "0";
+      kvMb.appendChild(kvIc);
+      kvMb.style.padding = "0";
+      kvMb.style.maxWidth = "none";
+      kvMb.style.background = "none";
+    }
     const itx = $("#input-text");
     if (itx && !itx._kvSendBound) { itx._kvSendBound = true; itx.addEventListener("input", updateKvSend); }
     updateKvSend();
@@ -845,6 +855,8 @@ function paintTopbarTitle() {
     if (newBtn && _kvOrigNew !== null) newBtn.innerHTML = _kvOrigNew;
     if (mapBtn) mapBtn.style.display = "none";
     tt.textContent = curSession().name;
+    const kvMb = $("#model-btn");
+    if (kvMb) { kvMb.style.padding = ""; kvMb.style.maxWidth = ""; kvMb.style.background = ""; kvMb.textContent = curProvider().model || "选择模型"; }
     const sb = $("#send-btn"); if (sb) sb.classList.remove("kv-send-empty");
   }
 }
