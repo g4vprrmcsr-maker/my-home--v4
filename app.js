@@ -832,7 +832,7 @@ function paintTopbarTitle() {
     tt.innerHTML = "";
     const clip = "display:block;width:100%;max-width:100%;box-sizing:border-box;text-align:left;direction:ltr;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
     const t1 = el("div", "", curSession().name);
-    t1.style.cssText = clip + "line-height:1.2;font-size:16px;font-weight:500;";
+    t1.style.cssText = clip + "line-height:1.2;font-size:var(--title-fs,16px);font-weight:var(--title-fw,500);";
     const p = curProvider();
     const t2 = el("div", "", (p.model || "") + (p.name ? " (" + p.name + ")" : ""));
     t2.style.cssText = clip + "font-size:11px;font-weight:500;line-height:1.2;margin-top:2px;color:color-mix(in srgb,var(--text-main) 60%,transparent);";
@@ -1390,8 +1390,6 @@ async function buildKelivoRow(m, gi, aiSrc, userSrc) {
     bubble.style.borderRadius = st.bubbleRadius + "px";
     bubble.style.padding = st.bubblePadV + "px " + st.bubblePadH + "px";
     bubble.style.maxWidth = st.bubbleMaxW + "%";
-    bubble.style.lineHeight = "1.4";
-    txt.style.fontSize = "15.5px";
     const c = bubbleColorOf(true);
     if (c) { bubble.style.background = c.bg; if (c.dark) bubble.style.color = "#f2f2f2"; }
   } else {
