@@ -820,7 +820,7 @@ function paintTopbarTitle() {
   if (newBtn && _kvOrigNew === null) _kvOrigNew = newBtn.innerHTML;
   let mapBtn = document.getElementById("kv-map-btn");
   if (isKv) {
-    if (menuBtn) menuBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11"/><path d="M4 12h16"/><path d="M4 17h8"/></svg>';
+    if (menuBtn) menuBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11"/><path d="M4 12h16"/><path d="M4 17h8"/></svg>';
     if (newBtn) newBtn.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>';
     if (newBtn && !mapBtn) {
       mapBtn = el("button", "topbar-btn"); mapBtn.id = "kv-map-btn";
@@ -832,7 +832,7 @@ function paintTopbarTitle() {
     tt.innerHTML = "";
     const clip = "display:block;width:100%;max-width:100%;box-sizing:border-box;text-align:left;direction:ltr;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
     const t1 = el("div", "", curSession().name);
-    t1.style.cssText = clip + "line-height:1.2;font-size:16px;font-weight:500;";
+    t1.style.cssText = clip + "line-height:1.2;font-size:var(--title-fs,16px);font-weight:var(--title-fw,500);";
     const p = curProvider();
     const t2 = el("div", "", (p.model || "") + (p.name ? " (" + p.name + ")" : ""));
     t2.style.cssText = clip + "font-size:11px;font-weight:500;line-height:1.2;margin-top:2px;color:color-mix(in srgb,var(--text-main) 60%,transparent);";
