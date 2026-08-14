@@ -820,7 +820,7 @@ function paintTopbarTitle() {
   if (newBtn && _kvOrigNew === null) _kvOrigNew = newBtn.innerHTML;
   let mapBtn = document.getElementById("kv-map-btn");
   if (isKv) {
-    if (menuBtn) menuBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 7 Q11 6.4 15 7"/><path d="M4 12 Q12 11.35 20 12"/><path d="M7 17 Q11.5 16.5 15.5 17"/></svg>';
+    if (menuBtn) menuBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h11"/><path d="M4 12h16"/><path d="M4 17h8"/></svg>';
     if (newBtn) newBtn.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>';
     if (newBtn && !mapBtn) {
       mapBtn = el("button", "topbar-btn"); mapBtn.id = "kv-map-btn";
@@ -840,9 +840,17 @@ function paintTopbarTitle() {
     const kvMb = $("#model-btn");
     if (kvMb) {
       kvMb.innerHTML = "";
-      const kvIc = makeModelIcon(curProvider().model || "", 26);
-      kvIc.style.margin = "0";
-      kvMb.appendChild(kvIc);
+      const svg = iconFor(curProvider().model || "");
+      if (svg) {
+        const w = el("span", "");
+        w.style.cssText = "display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;color:var(--text-main);";
+        w.innerHTML = svg;
+        const si = w.querySelector("svg");
+        if (si) { si.style.width = "24px"; si.style.height = "24px"; }
+        kvMb.appendChild(w);
+      } else {
+        kvMb.textContent = (curProvider().model || "?").charAt(0).toUpperCase();
+      }
       kvMb.style.padding = "0";
       kvMb.style.maxWidth = "none";
       kvMb.style.background = "none";
